@@ -1,0 +1,28 @@
+[project]
+name = "pmhelpers"
+version = "0.1.0"
+description = "Helpers for predictive maintenance analysis"
+authors = [{ name = "Michael Atkinson", email = "atki2828@gmail.com" }]
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "streamlit",
+    "pandas",
+    "numpy",
+    "matplotlib",
+    "seaborn",
+    "lifelines",
+    "polars",
+    "scikit-learn",
+    "plotly",
+    "jupyterlab",
+    "ipykernel"
+]
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["pmhelpers"]
+package-dir = { "" = "src" }
