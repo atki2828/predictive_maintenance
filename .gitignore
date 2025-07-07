@@ -4,6 +4,7 @@ __pycache__/
 *.egg-info/
 *.egg
 *.pkl
+*_learning.py
 
 # Virtual environment
 .venv/
