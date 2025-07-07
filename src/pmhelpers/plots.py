@@ -1,7 +1,10 @@
+from typing import Union
+
 import matplotlib.pyplot as plt
-import seaborn as sns
-import pandas as pd
 import numpy as np
+import pandas as pd
+import seaborn as sns
+from lifelines import CoxPHFitter, CoxTimeVaryingFitter
 from matplotlib.lines import Line2D
 
 
@@ -17,7 +20,7 @@ def box_and_strip(df, x, y, figsize=(15, 5), alpha=0.3, title=""):
     plt.show()
 
 
-def survival_hazard_group_plotter(model_dict, model_name=""):
+def survival_hazard_group_plotter(model_dict: dict, model_name: str = ""):
     fig, ax = plt.subplots(nrows=2, ncols=1, figsize=(15, 8))
     for group in model_dict.keys():
         model_dict[group].plot_survival_function(ax=ax[0])
@@ -102,5 +105,30 @@ def plot_timeseries_stacked(
         handles=legend_lines, loc="upper left", ncol=1, bbox_to_anchor=(1.01, 0)
     )
     axes[-1].set_xlabel("Date")
+    plt.tight_layout()
+    plt.show()
+
+
+def plot_top_cox_predictors(
+    model: Union[CoxPHFitter, CoxTimeVaryingFitter],
+    top_n: int = 20,
+    title: str = "Top Predictors of Hazard (Cox Coefficients)",
+):
+    """
+    Plots the top N most significant predictors from a fitted Cox model.
+
+    Parameters:
+    - model: Fitted lifelines CoxTimeVaryingFitter or CoxPHFitter
+    - top_n: Number of top predictors to display (ranked by lowest p-value)
+    - title: Plot title
+    """
+    summary = model.summary.sort_values("p")
+    top = summary.head(top_n)
+
+    plt.figure(figsize=(10, 6))
+    plt.barh(top.index[::-1], top["coef"][::-1], xerr=top["se(coef)"][::-1])
+    plt.axvline(0, color="black", linestyle="--")
+    plt.title(title)
+    plt.xlabel("Coefficient (log hazard ratio)")
     plt.tight_layout()
     plt.show()
