@@ -24,8 +24,8 @@ requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
+# Now that src is gone, just point to the root directory
 packages = ["pmhelpers"]
-package-dir = { "" = "src" }
 
 [tool.isort]
 profile = "black"
