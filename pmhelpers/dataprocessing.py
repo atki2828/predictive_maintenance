@@ -146,3 +146,18 @@ def create_time_to_fail_df(df_fail: pl.DataFrame, window_cols):
         .drop_nulls()
     )
     return time_to_fail_df
+
+
+def create_fail_plot_df(df_fail: pl.DataFrame, fail_col: str) -> pl.DataFrame:
+    return (
+        df_fail.select(pl.col(fail_col)).to_series().value_counts().sort(fail_col)
+    ).with_columns(percent=pl.col("count") / pl.col("count").sum() * 100)
+
+
+def create_main_fail_flag_df(df_main, df_fail) -> pl.DataFrame:
+    return df_main.join(
+        df_fail.with_columns(pl.lit(1).alias("fail_flag")),
+        left_on=df_main.columns,
+        right_on=df_fail.columns,
+        how="left",
+    )
