@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
-from lifelines import CoxPHFitter, CoxTimeVaryingFitter
+from lifelines import CoxPHFitter, CoxTimeVaryingFitter, WeibullFitter
 from matplotlib.lines import Line2D
 
 
@@ -125,10 +125,65 @@ def plot_top_cox_predictors(
     summary = model.summary.sort_values("p")
     top = summary.head(top_n)
 
-    plt.figure(figsize=(10, 6))
+    plt.figure(figsize=(12, 6))
     plt.barh(top.index[::-1], top["coef"][::-1], xerr=top["se(coef)"][::-1])
     plt.axvline(0, color="black", linestyle="--")
     plt.title(title)
     plt.xlabel("Coefficient (log hazard ratio)")
     plt.tight_layout()
     plt.show()
+
+
+def generate_survival_curv_example_fig():
+    np.random.seed(42)
+
+    n_machines = 30
+    max_time = 45
+
+    true_failures = np.random.weibull(a=2, size=n_machines) * 35
+    event_times = np.clip(true_failures, 0, max_time)
+    observed = np.where(event_times < max_time, True, False)
+
+    df = (
+        pd.DataFrame(
+            {
+                "machine_id": [f"Machine {i+1}" for i in range(n_machines)],
+                "duration": event_times,
+                "event": observed,
+            }
+        )
+        .sort_values(by="duration", ascending=True)
+        .reset_index(drop=True)
+    )
+
+    wf = WeibullFitter()
+    wf.fit(df["duration"], event_observed=df["event"])
+
+    fig, (ax1, ax2, ax3) = plt.subplots(
+        1, 3, figsize=(16, 8), gridspec_kw={"width_ratios": [1, 1, 1]}
+    )
+
+    # Left plot: lollipop failure/censored plot
+    for i, row in df.iterrows():
+        ax1.hlines(y=i, xmin=0, xmax=row["duration"], color="gray", alpha=0.6)
+        marker = "x" if row["event"] else "o"
+        color = "red" if row["event"] else "blue"
+        ax1.plot(row["duration"], i, marker=marker, color=color, markersize=8)
+
+    ax1.set_yticks(range(n_machines))
+    ax1.set_yticklabels(df["machine_id"])
+    ax1.set_xlabel("Time to Failure or Censoring (Days)")
+    ax1.set_title("Machine Lifetimes: Failures (X) vs Censored (O)")
+    ax1.invert_yaxis()
+
+    # Right plot: fitted survival curve
+    wf.plot_survival_function(ax=ax2)
+    ax2.set_title("Weibull Fitted Survival Curve")
+    ax2.set_xlabel("Time (Days)")
+    ax2.set_ylabel("Survival Probability")
+
+    wf.plot_hazard(ax=ax3)
+    ax3.set_title("Weibull Fitted Hazard Curve")
+    ax3.set_xlabel("Time (Days)")
+    ax3.set_ylabel("Hazard")
+    return fig

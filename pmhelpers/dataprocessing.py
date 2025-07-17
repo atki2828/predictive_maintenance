@@ -3,6 +3,13 @@ from datetime import datetime
 import numpy as np
 import pandas as pd
 import polars as pl
+import streamlit as st
+
+
+@st.cache_data
+def load_data(file_path: str) -> pl.DataFrame:
+    df = pl.read_csv(file_path)
+    return df
 
 
 def create_time_between_fail_group_df(
