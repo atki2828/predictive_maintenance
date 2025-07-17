@@ -145,3 +145,22 @@ Same interpretability: coefficients still tell you the effect of a covariate on 
 
 It still assumes proportional hazards, but now in the context of **instantaneous covariate values**. And again for **inference**, violations are a red flag. But for **predictive maintenance**, it’s usually fine. Our end goal is to rank machines by risk, not to get peer-reviewed.
 """
+
+
+eda_intro = r"""## Exploratory Data Analysis 🔎
+
+To demonstrate the practical utility of the Cox Proportional Hazards model for predictive maintenance, we'll be working with the **Microsoft Azure Predictive Maintenance dataset** — a synthetic yet well-structured dataset that simulates machine health over the course of a year across **100 unique machines**.
+
+The available data includes:
+
+1. **Telemetry data**: Hourly readings of Voltage, Rotation, Pressure, and Vibration  
+2. **Errors**: Timestamped logs of error codes (types 1–5)  
+3. **Maintenance records**: Logs of component replacements (components 1–4), regardless of failure  
+4. **Failure records**: Logs of component replacements **due to failure**  
+5. **Machine metadata**: Machine age and model type  
+
+> 📌 **Note**: For simplicity, all data has been aggregated to the **daily level** for this analysis.
+
+---
+
+The goal of this **EDA** is to identify **early warning signals** of component failure that can serve as covariates in a **Cox Proportional Hazards (Cox PH)** model. We'll explore patterns and trends in telemetry data, error codes, and maintenance history to better understand the **failure dynamics** and prepare the data for survival modeling."""

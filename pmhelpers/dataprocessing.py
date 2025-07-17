@@ -8,7 +8,7 @@ import streamlit as st
 
 @st.cache_data
 def load_data(file_path: str) -> pl.DataFrame:
-    df = pl.read_csv(file_path)
+    df = pl.read_csv(file_path, try_parse_dates=True)
     return df
 
 
@@ -127,3 +127,22 @@ def create_train_test_df(
 
     test_df = df.filter(pl.col("date") > split_date)
     return train_df, test_df
+
+
+def create_time_to_fail_df(df_fail: pl.DataFrame, window_cols):
+    sort_cols = window_cols + ["datetime"]
+    time_to_fail_df = (
+        df_fail.sort(sort_cols)
+        .with_columns(
+            [pl.col("datetime").shift(-1).over(window_cols).alias("next_failure_time")]
+        )
+        .with_columns(
+            [
+                (pl.col("next_failure_time") - pl.col("datetime"))
+                .dt.total_days()
+                .alias("time_between_failures")
+            ]
+        )
+        .drop_nulls()
+    )
+    return time_to_fail_df

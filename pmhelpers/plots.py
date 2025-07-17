@@ -3,21 +3,29 @@ from typing import Union
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import polars as pl
 import seaborn as sns
 from lifelines import CoxPHFitter, CoxTimeVaryingFitter, WeibullFitter
 from matplotlib.lines import Line2D
 
 
-def box_and_strip(df, x, y, figsize=(15, 5), alpha=0.3, title=""):
-    plt.figure(figsize=figsize)
-    sns.boxplot(
-        data=df, x=x, y=y, showcaps=True, boxprops=dict(alpha=alpha), showfliers=False
-    )
-    sns.stripplot(data=df, x=x, y=y, color="black", size=3.5, jitter=True)
+def plot_box_and_strip(df, x, y, figsize=(15, 5), alpha=0.3, title=""):
+    fig, ax = plt.subplots(figsize=figsize)
 
-    plt.title(title)
+    sns.boxplot(
+        data=df,
+        x=x,
+        y=y,
+        showcaps=True,
+        boxprops=dict(alpha=alpha),
+        showfliers=False,
+        ax=ax,
+    )
+    sns.stripplot(data=df, x=x, y=y, color="black", size=3.5, jitter=True, ax=ax)
+
+    ax.set_title(title)
     plt.tight_layout()
-    plt.show()
+    return fig
 
 
 def survival_hazard_group_plotter(model_dict: dict, model_name: str = ""):
@@ -186,4 +194,146 @@ def generate_survival_curv_example_fig():
     ax3.set_title("Weibull Fitted Hazard Curve")
     ax3.set_xlabel("Time (Days)")
     ax3.set_ylabel("Hazard")
+    return fig
+
+
+def plot_failure_counts(df_fail: pl.DataFrame):
+    # Aggregate counts and compute percentages
+    comp_fail_plot_df = (
+        df_fail.select(pl.col("failure"))
+        .to_series()
+        .value_counts()
+        .sort("failure")
+        .with_columns(percent=pl.col("count") / pl.col("count").sum() * 100)
+    )
+
+    df_plot = comp_fail_plot_df.to_pandas()
+
+    # Create plot
+    fig, ax = plt.subplots(figsize=(15, 5))
+    sns.barplot(data=df_plot, x="failure", y="count", ax=ax)
+    for i, row in df_plot.iterrows():
+        ax.text(i, row["count"], f"{row['percent']:.1f}%", ha="center", va="bottom")
+
+    ax.set_xticklabels(ax.get_xticklabels(), rotation=45)
+    ax.set_title("Failure Component Counts with Percentages")
+    ax.set_xlabel("Component")
+    ax.set_ylabel("Count")
+    plt.tight_layout()
+
+    return fig
+
+
+def plot_machine_failure_counts(df_fail: pl.DataFrame):
+    # Aggregate counts and compute percentages
+    mach_fail_plot_df = (
+        df_fail.select(pl.col("machineID"))
+        .to_series()
+        .value_counts()
+        .sort("machineID")
+        .with_columns(percent=pl.col("count") / pl.col("count").sum() * 100)
+    )
+
+    # Convert to pandas for seaborn
+    df_plot = mach_fail_plot_df.to_pandas()
+
+    # Create plot
+    fig, ax = plt.subplots(figsize=(18, 5))
+    sns.barplot(data=df_plot, x="machineID", y="count", ax=ax)
+
+    # Add percentage labels above bars
+    for i, row in df_plot.iterrows():
+        ax.text(i, row["count"], f"{row['percent']:.1f}%", ha="center", va="bottom")
+
+    # Style the plot
+    ax.set_title("Machine ID Failure Counts with Percentages")
+    ax.set_xticklabels(ax.get_xticklabels(), rotation=45)
+    ax.set_xlabel("Machine")
+    ax.set_ylabel("Count")
+    plt.tight_layout()
+
+    return fig
+
+
+def plot_time_between_failures_dist(df_fail: pl.DataFrame) -> plt.Figure:
+    """
+    Compute and return a Matplotlib figure showing the distribution of time between failures.
+
+    Parameters
+    ----------
+    df_fail : pl.DataFrame
+        Polars DataFrame containing:
+        - 'machineID'
+        - 'failure'
+        - 'datetime' (as a datetime column)
+
+    Returns
+    -------
+    fig : matplotlib.figure.Figure
+        The figure object for rendering in Streamlit or saving.
+    """
+    # Define columns for grouping
+    window_cols = ["machineID", "failure"]
+    sort_cols = window_cols + ["datetime"]
+
+    # Compute time between failures
+    time_to_fail_df = (
+        df_fail.sort(sort_cols)
+        .with_columns(
+            [pl.col("datetime").shift(-1).over(window_cols).alias("next_failure_time")]
+        )
+        .with_columns(
+            [
+                (pl.col("next_failure_time") - pl.col("datetime"))
+                .dt.total_days()
+                .alias("time_between_failures")
+            ]
+        )
+        .drop_nulls()
+    )
+
+    # Convert to pandas for plotting
+    pdf = time_to_fail_df.to_pandas()
+
+    # Create the figure
+    fig, ax = plt.subplots(figsize=(15, 5))
+    sns.histplot(pdf, x="time_between_failures", kde=True, bins=50, ax=ax)
+    ax.set_title("Distribution of Time Between Component Failures", fontsize=14)
+    ax.set_xlabel("Time Between Failures (Days)", fontsize=12)
+    ax.set_ylabel("Frequency", fontsize=12)
+    fig.tight_layout()
+
+    return fig
+
+
+def plot_time_between_maintenance_dist(df: pl.DataFrame) -> plt.Figure:
+    """
+    Plot and return a histogram of time between maintenance and failure, with hue based on fail_flag.
+
+    Parameters
+    ----------
+    df : pl.DataFrame
+        Polars DataFrame with columns:
+        - 'time_between_maintenance' (numeric)
+        - 'fail_flag' (categorical or boolean)
+
+    Returns
+    -------
+    fig : matplotlib.figure.Figure
+        The Matplotlib figure object for rendering or saving.
+    """
+    # Convert to pandas for seaborn
+    pdf = df.to_pandas()
+
+    # Create the figure
+    fig, ax = plt.subplots(figsize=(15, 5))
+    sns.histplot(
+        pdf, x="time_between_maintenance", kde=True, bins=30, hue="fail_flag", ax=ax
+    )
+
+    ax.set_title("Time Between Maintenance And Failure", fontsize=14)
+    ax.set_xlabel("Time Between Maintenance (Days)", fontsize=12)
+    ax.set_ylabel("Frequency", fontsize=12)
+
+    fig.tight_layout()
     return fig
