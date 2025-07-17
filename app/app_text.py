@@ -164,3 +164,27 @@ The available data includes:
 ---
 
 The goal of this **EDA** is to identify **early warning signals** of component failure that can serve as covariates in a **Cox Proportional Hazards (Cox PH)** model. We'll explore patterns and trends in telemetry data, error codes, and maintenance history to better understand the **failure dynamics** and prepare the data for survival modeling."""
+
+component_failure_text = """### Component Failures Across Machines 
+
+Since the predictive maintenance model Iare aiming to build is focused on component failures, let's look at the proportions of failures across the 4 components across all machines.   
+
+Below Ican see Component 2 fails the most frequently while Component 3 fails the least. """
+
+
+all_machine_failures_text = """### Failures Across All Machines
+
+Looking at the total number of failures across all machines Isee that machine **99** has the most failures with 18."""
+
+time_between_failure_text = """ ### Pure Time Between Failures
+
+Since our model will take into account the time to event, it is worthwhile to take a look at the distribution of time between failures across components."""
+
+time_between_comp_fail_text = """### Time Between Component Failures
+Here Ibreakout the distribution of time between component failures across all the 4 components on each machine.
+
+Ican also see that the failure records occur in multiples of 15 days. (product of a contrived likely simulated dataset). """
+
+compare_time_between_fail_text = """ ### Comparing time between regularly scheduled maintenace and component failure
+
+This comparison shows that regular maintenance seems to require replacing the component every 15 days. For the instance marked 0 (in red) Ican see that most of the time components are replaced 15 days and that component failures occur when this regular maintenace was missed. """

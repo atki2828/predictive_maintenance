@@ -1,0 +1,86 @@
+import matplotlib.pyplot as plt
+import polars as pl
+import streamlit as st
+from app_text import (
+    all_machine_failures_text,
+    compare_time_between_fail_text,
+    component_failure_text,
+    eda_intro,
+    time_between_comp_fail_text,
+    time_between_failure_text,
+)
+
+from pmhelpers.dataprocessing import load_data
+from pmhelpers.plots import (
+    plot_box_and_strip,
+    plot_failure_counts,
+    plot_machine_failure_counts,
+    plot_time_between_failures_dist,
+)
+
+plt.style.use("ggplot")
+TELEMETRY_FILE_PATH = "./data/PdM_telemetry.csv"
+FAILURE_FILE_PATH = "./data/PdM_failures.csv"
+MACHINE_FILE_PATH = "./data/PdM_machines.csv"
+MAINTENANCE_FILE_PATH = "./data/PdM_maintenance.csv"
+ERROR_FILE_PATH = "./data/PdM_errors.csv"
+
+COMP_FAIL_PLOT_PATH = "./data/comp_fail_plot.csv"
+MACHINE_FAIL_PLOT_PATH = "./data/machine_fail_plot.csv"
+TIME_BETWEEN_FAIL_FLAG_PATH = "./data/time_between_fail_flag.csv"
+TIME_TO_FAIL_PATH = "./data/time_to_fail.csv"
+
+
+def main():
+    # Read and Cache Data
+    comp_fail_plot_df = load_data(COMP_FAIL_PLOT_PATH)
+    mach_fail_plot_df = load_data(MACHINE_FAIL_PLOT_PATH)
+    time_to_fail_df = load_data(TIME_TO_FAIL_PATH)
+    time_between_comp_fail_fig_df = load_data(TIME_BETWEEN_FAIL_FLAG_PATH)
+
+    # Intro
+    st.markdown(eda_intro)
+
+    # Component Failure Plot
+    failure_count_fig = plot_failure_counts(comp_fail_plot_df)
+    st.markdown(component_failure_text)
+    st.pyplot(failure_count_fig)
+    st.divider()
+
+    # Machine Failure Count Plot
+    st.markdown(all_machine_failures_text)
+    machine_fail_count_fig = plot_machine_failure_counts(mach_fail_plot_df)
+    st.pyplot(machine_fail_count_fig)
+    st.divider()
+
+    # Time To Failure dist
+    st.markdown(time_between_failure_text)
+    time_between_fail_dist_fig = plot_time_between_failures_dist(time_to_fail_df)
+    st.pyplot(time_between_fail_dist_fig)
+    st.divider()
+
+    # Time Between Component Failure Text
+    st.markdown(time_between_comp_fail_text)
+    time_between_comp_fail_fig = plot_box_and_strip(
+        df=time_to_fail_df.sort("failure").to_pandas(),
+        x="failure",
+        y="time_between_failures",
+        title="Time Between Failures By Component",
+    )
+    st.pyplot(time_between_comp_fail_fig)
+    st.divider()
+
+    # Compare Time Between Fail Text
+    st.markdown(compare_time_between_fail_text)
+    compare_fig = plot_box_and_strip(
+        time_between_comp_fail_fig_df.to_pandas(),
+        x="fail_flag",
+        y="time_between_maintenance",
+        title="Time Between Maintenance and Failures",
+    )
+    st.pyplot(compare_fig)
+    st.divider()
+
+
+if __name__ == "__main__":
+    main()

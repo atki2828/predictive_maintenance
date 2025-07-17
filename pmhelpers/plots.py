@@ -9,9 +9,12 @@ from lifelines import CoxPHFitter, CoxTimeVaryingFitter, WeibullFitter
 from matplotlib.lines import Line2D
 
 
-def plot_box_and_strip(df, x, y, figsize=(15, 5), alpha=0.3, title=""):
+def plot_box_and_strip(
+    df: pd.DataFrame, x, y, figsize=(15, 5), alpha=0.3, title="", hue=""
+):
     fig, ax = plt.subplots(figsize=figsize)
-
+    if not hue:
+        hue = x
     sns.boxplot(
         data=df,
         x=x,
@@ -20,6 +23,7 @@ def plot_box_and_strip(df, x, y, figsize=(15, 5), alpha=0.3, title=""):
         boxprops=dict(alpha=alpha),
         showfliers=False,
         ax=ax,
+        hue=hue,
     )
     sns.stripplot(data=df, x=x, y=y, color="black", size=3.5, jitter=True, ax=ax)
 
@@ -197,21 +201,12 @@ def generate_survival_curv_example_fig():
     return fig
 
 
-def plot_failure_counts(df_fail: pl.DataFrame):
-    # Aggregate counts and compute percentages
-    comp_fail_plot_df = (
-        df_fail.select(pl.col("failure"))
-        .to_series()
-        .value_counts()
-        .sort("failure")
-        .with_columns(percent=pl.col("count") / pl.col("count").sum() * 100)
-    )
-
-    df_plot = comp_fail_plot_df.to_pandas()
-
+def plot_failure_counts(df_plot: pl.DataFrame):
+    if isinstance(df_plot, pl.DataFrame):
+        df_plot = df_plot.to_pandas()
     # Create plot
     fig, ax = plt.subplots(figsize=(15, 5))
-    sns.barplot(data=df_plot, x="failure", y="count", ax=ax)
+    sns.barplot(data=df_plot, x="failure", y="count", ax=ax, hue="failure")
     for i, row in df_plot.iterrows():
         ax.text(i, row["count"], f"{row['percent']:.1f}%", ha="center", va="bottom")
 
@@ -224,80 +219,32 @@ def plot_failure_counts(df_fail: pl.DataFrame):
     return fig
 
 
-def plot_machine_failure_counts(df_fail: pl.DataFrame):
-    # Aggregate counts and compute percentages
-    mach_fail_plot_df = (
-        df_fail.select(pl.col("machineID"))
-        .to_series()
-        .value_counts()
-        .sort("machineID")
-        .with_columns(percent=pl.col("count") / pl.col("count").sum() * 100)
-    )
-
-    # Convert to pandas for seaborn
-    df_plot = mach_fail_plot_df.to_pandas()
-
+def plot_machine_failure_counts(df_plot: pl.DataFrame):
+    if isinstance(df_plot, pl.DataFrame):
+        df_plot = df_plot.to_pandas().assign(
+            machineID=lambda df: df["machineID"].astype("category")
+        )
     # Create plot
     fig, ax = plt.subplots(figsize=(18, 5))
-    sns.barplot(data=df_plot, x="machineID", y="count", ax=ax)
-
-    # Add percentage labels above bars
-    for i, row in df_plot.iterrows():
-        ax.text(i, row["count"], f"{row['percent']:.1f}%", ha="center", va="bottom")
-
+    sns.barplot(data=df_plot, x="machineID", y="count", ax=ax, hue="machineID")
     # Style the plot
-    ax.set_title("Machine ID Failure Counts with Percentages")
+    ax.set_title("Machine ID Failure Counts")
     ax.set_xticklabels(ax.get_xticklabels(), rotation=45)
     ax.set_xlabel("Machine")
     ax.set_ylabel("Count")
+    ax.get_legend().remove()
     plt.tight_layout()
 
     return fig
 
 
-def plot_time_between_failures_dist(df_fail: pl.DataFrame) -> plt.Figure:
-    """
-    Compute and return a Matplotlib figure showing the distribution of time between failures.
+def plot_time_between_failures_dist(time_to_fail_df: pl.DataFrame) -> plt.Figure:
 
-    Parameters
-    ----------
-    df_fail : pl.DataFrame
-        Polars DataFrame containing:
-        - 'machineID'
-        - 'failure'
-        - 'datetime' (as a datetime column)
-
-    Returns
-    -------
-    fig : matplotlib.figure.Figure
-        The figure object for rendering in Streamlit or saving.
-    """
-    # Define columns for grouping
-    window_cols = ["machineID", "failure"]
-    sort_cols = window_cols + ["datetime"]
-
-    # Compute time between failures
-    time_to_fail_df = (
-        df_fail.sort(sort_cols)
-        .with_columns(
-            [pl.col("datetime").shift(-1).over(window_cols).alias("next_failure_time")]
-        )
-        .with_columns(
-            [
-                (pl.col("next_failure_time") - pl.col("datetime"))
-                .dt.total_days()
-                .alias("time_between_failures")
-            ]
-        )
-        .drop_nulls()
-    )
-
-    # Convert to pandas for plotting
     pdf = time_to_fail_df.to_pandas()
 
     # Create the figure
     fig, ax = plt.subplots(figsize=(15, 5))
-    sns.histplot(pdf, x="time_between_failures", kde=True, bins=50, ax=ax)
+    sns.histplot(pdf, x="time_between_failures", kde=True, ax=ax)
     ax.set_title("Distribution of Time Between Component Failures", fontsize=14)
     ax.set_xlabel("Time Between Failures (Days)", fontsize=12)
     ax.set_ylabel("Frequency", fontsize=12)
