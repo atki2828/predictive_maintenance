@@ -1,6 +1,11 @@
-import streamlit as st
+import os
+import sys
 
-from app.app_text import app_overview, intro
+import streamlit as st
+from app_text import app_overview, intro
+from src.pmhelpers.dataprocessing import *
+
+# sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 def main():

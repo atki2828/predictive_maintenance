@@ -4,6 +4,9 @@ In the realm of practical **predictive maintenance** use cases, it's tempting fo
 
 This `streamlit` app explores that alternative using the Azure Predictive Maintenance dataset to show how a **Cox PH** model can be developed and deployed in a real-world scenario to support smarter maintenance decisions.
 
+I will demonstrate how to extend the **Cox PH** approach with time-varying covariates to model the **probability of a component failure within the next 2 days** as a sample use case. This example illustrates how maintenance teams can leverage these tools to prioritize their work more effectively based on dynamic risk estimates and incorporating ever changing **telemetry data**.
+
+
 Before diving in, here’s why I think this modeling approach is so well-suited for predictive maintenance:
 
 ✅ Combines static attributes (e.g., manufacturer, install date) with real-time telemetry from sensors   
