@@ -35,6 +35,7 @@ app_overview = """
     - Summary statistics
     - Visualizations of key features
     - Failure event distributions
+    - Weibull Survival and Hazard Distributions
 
     ---
 
