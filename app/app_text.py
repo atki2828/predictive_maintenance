@@ -84,12 +84,6 @@ $$
 h(t) = \frac{f(t)}{S(t)}
 $$
 
-Or, using the derivative of the survival function:
-
-$$
-h(t) = -\frac{d}{dt} \log S(t)
-$$
-
 Where:  
 -  $f(t)$ is the probability density function (PDF) of the event times  
 -  $S(t)$ is the survival function
@@ -127,7 +121,6 @@ $$
 Where:  
 - $h_0(t)$ is the **baseline hazard** (the risk when all covariates are zero)  
 - $\boldsymbol{\beta}$ are the model coefficients  
-- $\mathbf{x}_i$ are the covariates for subject *i*
 
 This formulation lets us compare how different factors, like machine vibration, voltage, pressure scale the hazard. A positive coefficient means increasing that feature boosts the hazard (bad news), while a negative one suggests it's protective (your new favorite sensor reading).
 
