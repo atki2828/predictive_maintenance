@@ -128,8 +128,6 @@ One key assumption here is the **proportional hazards assumption**: the ratio of
 
 For **inference**, this assumption can matter. And sometimes it can matter a lot! If you're making decisions or writing papers and this assumption doesn't hold, your hazard ratios might lie to you. But for **prediction**? Not a deal-breaker. If you're just trying to forecast failure probabilities and support operational decisions, you can often get away with it especially if you use **probability calibration techniques** down the line (e.g., Platt scaling, isotonic regression).
 
-[<span style="color:blue">lifelines</span>](https://lifelines.readthedocs.io/en/latest/jupyter_notebooks/Proportional%20hazard%20assumption.html) has a great explanation in their documentation... just click the link to learn more.
-
 **Note**: This notebook will not cover calibration as it is long enough already
 
 ---
