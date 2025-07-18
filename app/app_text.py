@@ -64,12 +64,12 @@ app_overview = """
 
 theory_intro = r"""## Theoretical Background🧠  
 
-Survival analysis has its roots in the life sciences, think clinical trials and patient follow-ups, but like all good ideas, it didn’t stay in its lane. Over time, these **“Survival Analysis”** methods found their way into fields like manufacturing, finance, marketing, and of course, predictive maintenance. In broader terms, this family of methods is often called **“Time To Event Analysis.”** If you’re in reliability engineering, you might hear it dressed up as **“Reliability Analysis.”** Same idea, different buzzword.
+Survival analysis has its roots in the life sciences, think clinical trials and patient follow-ups, but like all good ideas, it didn’t stay in its lane. Over time, these **“Survival Analysis”** methods found their way into fields like manufacturing, finance, marketing, and of course, predictive maintenance. In broader terms, this family of methods is often called **“Time To Event Analysis.”** If you’re in reliability engineering, you might hear it dressed up as **“Reliability Analysis.”**  
 
 **Survival Functions**   
 Whatever label you slap on it, the core question remains the same: **How long until something important happens?**
 
-In this framework, you track a subject say, a machine component, from a known start time, and either observe it fail (mission accomplished) or... nothing happens. That’s fine too. One of the quirks (and strengths) of time to event analysis is the concept of censoring  when the event hasn’t happened yet, but you still know how long it took to **NOT** happen. That’s useful information! It's like saying: “I didn’t catch fire today.” Good to know.
+In this framework, you track a subject say, a machine component, from a known start time, and either observe it fail (mission accomplished) or... nothing happens. That’s fine too. One of the quirks (and strengths) of time to event analysis is the concept of censoring  when the event hasn’t happened yet, but you still know how long it took to **NOT** happen. That’s useful information!   
 
 Mathematically, the survival function $𝑆(𝑡)$  gives us the probability that the event of interest hasn’t occurred by time **t:** $$S(t)=P(T>t)=1−F(t)$$
 
@@ -109,24 +109,26 @@ When it comes to survival modeling, the Cox Proportional Hazards (CPH) model is 
 The model expresses the hazard for a subject at time *t* as:
 
 $$
-h(t) = h_0(t) \cdot \exp(\beta_1 x_{i1} + \beta_2 x_{i2} + \dots + \beta_p x_{ip})
+h(t) = h_0(t) \cdot \exp(\beta_1 x_{1} + \beta_2 x_{2} + \dots + \beta_p x_{p})
 $$
 
 Or more compactly:
 
 $$
-h(t) = h_0(t) \cdot \exp(\mathbf{x}_i^\top \boldsymbol{\beta})
+h(t) = h_0(t) \cdot \exp(\mathbf{x}^\top \boldsymbol{\beta})
 $$
 
 Where:  
 - $h_0(t)$ is the **baseline hazard** (the risk when all covariates are zero)  
 - $\boldsymbol{\beta}$ are the model coefficients  
 
-This formulation lets us compare how different factors, like machine vibration, voltage, pressure scale the hazard. A positive coefficient means increasing that feature boosts the hazard (bad news), while a negative one suggests it's protective (your new favorite sensor reading).
+This formulation lets us compare how different factors, like machine manufacturer or model scale the hazard function. A positive coefficient means increasing that feature boosts the hazard (bad news), while a negative one suggests it's protective.
 
 One key assumption here is the **proportional hazards assumption**: the ratio of hazards between any two cohort members is **constant over time**. In other words, if Component A is twice as risky as Component B today, it stays twice as risky tomorrow and forever more.
 
 For **inference**, this assumption can matter. And sometimes it can matter a lot! If you're making decisions or writing papers and this assumption doesn't hold, your hazard ratios might lie to you. But for **prediction**? Not a deal-breaker. If you're just trying to forecast failure probabilities and support operational decisions, you can often get away with it especially if you use **probability calibration techniques** down the line (e.g., Platt scaling, isotonic regression).
+
+[<span style="color:blue">lifelines</span>](https://lifelines.readthedocs.io/en/latest/jupyter_notebooks/Proportional%20hazard%20assumption.html) has a great explanation in their documentation... just click the link to learn more.
 
 **Note**: This notebook will not cover calibration as it is long enough already
 
