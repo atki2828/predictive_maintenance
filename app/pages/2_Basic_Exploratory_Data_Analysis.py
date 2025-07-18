@@ -8,14 +8,18 @@ from app_text import (
     eda_intro,
     time_between_comp_fail_text,
     time_between_failure_text,
+    weibull_survival_text,
 )
+from lifelines import WeibullFitter
 
 from pmhelpers.dataprocessing import load_data
+from pmhelpers.models import create_survival_model_dict
 from pmhelpers.plots import (
     plot_box_and_strip,
     plot_failure_counts,
     plot_machine_failure_counts,
     plot_time_between_failures_dist,
+    survival_hazard_group_plotter,
 )
 
 plt.style.use("ggplot")
@@ -36,7 +40,14 @@ def main():
     comp_fail_plot_df = load_data(COMP_FAIL_PLOT_PATH)
     mach_fail_plot_df = load_data(MACHINE_FAIL_PLOT_PATH)
     time_to_fail_df = load_data(TIME_TO_FAIL_PATH)
-    time_between_comp_fail_fig_df = load_data(TIME_BETWEEN_FAIL_FLAG_PATH)
+    time_between_comp_fail_flag_df = load_data(TIME_BETWEEN_FAIL_FLAG_PATH)
+    component_weibull_dict = create_survival_model_dict(
+        fail_flag_df=time_between_comp_fail_flag_df,
+        model=WeibullFitter,
+        group_level_col="model",
+        duration_col="time_between_maintenance",
+        observe_col="fail_flag",
+    )
 
     # Intro
     st.markdown(eda_intro)
@@ -73,13 +84,20 @@ def main():
     # Compare Time Between Fail Text
     st.markdown(compare_time_between_fail_text)
     compare_fig = plot_box_and_strip(
-        time_between_comp_fail_fig_df.to_pandas(),
+        time_between_comp_fail_flag_df.to_pandas(),
         x="fail_flag",
         y="time_between_maintenance",
         title="Time Between Maintenance and Failures",
     )
     st.pyplot(compare_fig)
     st.divider()
+
+    # Survival and Weibull Analysis DF
+    st.markdown(weibull_survival_text)
+    survival_fig = survival_hazard_group_plotter(
+        component_weibull_dict, model_name="Weibull Model"
+    )
+    st.pyplot(survival_fig)
 
 
 if __name__ == "__main__":

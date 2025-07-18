@@ -44,8 +44,7 @@ def survival_hazard_group_plotter(model_dict: dict, model_name: str = ""):
         ax[1].set_title(f"Hazard Function {model_name}")
         ax[1].set_xlabel("Time (Days)")
         ax[1].set_ylabel("Hazard")
-    plt.tight_layout()
-    plt.show()
+    return fig
 
 
 def plot_timeseries_stacked(

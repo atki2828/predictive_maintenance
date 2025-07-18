@@ -37,9 +37,17 @@ app_overview = """
     - Failure event distributions
     - Weibull Survival and Hazard Distributions
 
+     ---
+
+    ### 📈 Page 3: **Telemetry Feature Engineering Analysis**
+    Dive into the data with:
+    - Telemetry Time Series
+    - Visualizations Voltage, Rotation, Pressure, Vibrations
+    - Analysis of Telemetry signal interactions with Machine Errors, Regular Maintenance and **Component Failures** 
+
     ---
 
-    ### ⚙️ Page 3: **Production Dashboard**
+    ### ⚙️ Page 4: **Production Dashboard**
     Simulate and view model outputs as they would appear in a production setting.  
     Includes:
     - **Failure risk scores**
@@ -197,6 +205,11 @@ After looking at much of the telemetry data, I found that in this contrived like
 In the plots below the solid vertical lines are on the day of a component failure, the dashed lines are on the day of a scheduled maintenance and the dotted lines represent the day an error was tripped.
 """
 
+weibull_survival_text = """## Fitting Weibull Survival and Hazard Model
+
+The curves below show the **Survival** and **Hazard** functions for each of the 4 model types. This does not take into account components, but rather models the time to failure between any components on a given machine.
+
+It is evident that both **Model 1** and **Model 2** machines have less reliability (less time between failures) when compared to **Model 3** and **Model 4**."""
 
 telemetry_component_one_text = """
 ### Component 1 Failure Signatures
