@@ -52,6 +52,8 @@ def plot_timeseries_stacked(
     df: pd.DataFrame, sensors: list, time_col="date", machine_id=None
 ):
     n = len(sensors)
+    if isinstance(df, pl.DataFrame):
+        df = df.to_pandas()
 
     if machine_id is not None and "machineID" in df.columns:
         df = df[df["machineID"] == machine_id]
@@ -118,7 +120,7 @@ def plot_timeseries_stacked(
     )
     axes[-1].set_xlabel("Date")
     plt.tight_layout()
-    plt.show()
+    return fig
 
 
 def plot_top_cox_predictors(

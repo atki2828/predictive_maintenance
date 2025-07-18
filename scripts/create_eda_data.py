@@ -15,11 +15,11 @@ FAILURE_FILE_PATH = "./data/PdM_failures.csv"
 MACHINE_FILE_PATH = "./data/PdM_machines.csv"
 MAINTENANCE_FILE_PATH = "./data/PdM_maintenance.csv"
 ERROR_FILE_PATH = "./data/PdM_errors.csv"
-
 WRITE_DIR = "./data"
 
 
 def main():
+    # Read in Raw Data
     df_tel = pl.read_csv(TELEMETRY_FILE_PATH, try_parse_dates=True)
     df_err = pl.read_csv(ERROR_FILE_PATH, try_parse_dates=True)
     df_fail = pl.read_csv(FAILURE_FILE_PATH, try_parse_dates=True)
@@ -41,6 +41,7 @@ def main():
         max_datetime=max_datetime,
     ).join(df_mach, on="machineID", how="inner")
 
+    # The next steps create the daily agg df
     daily_agg_df = (
         df_tel.with_columns(pl.col("datetime").dt.date().alias("date"))
         .group_by(["machineID", "date"])

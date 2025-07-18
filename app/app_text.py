@@ -6,7 +6,6 @@ This `streamlit` app explores the Azure Predictive Maintenance dataset to show h
 
 I will demonstrate how to extend the **Cox PH** approach with time-varying covariates to model the **probability of a component failure within the next 2 days** as a sample use case. This example illustrates how maintenance teams can leverage these tools to prioritize their work more effectively based on dynamic risk estimates and incorporating ever changing **telemetry data**.
 
-s
 Before diving in, here’s why this modeling approach is so well-suited for predictive maintenance:
 
 ✅ Combines static attributes (e.g., manufacturer, install date) with real-time telemetry from sensors   
@@ -188,3 +187,66 @@ Ican also see that the failure records occur in multiples of 15 days. (product o
 compare_time_between_fail_text = """ ### Comparing time between regularly scheduled maintenace and component failure
 
 This comparison shows that regular maintenance seems to require replacing the component every 15 days. For the instance marked 0 (in red) Ican see that most of the time components are replaced 15 days and that component failures occur when this regular maintenace was missed. """
+
+telemetry_eda_intro = """
+## Telemetry Data
+
+After looking at much of the telemetry data, I found that in this contrived likely A.I. generated dataset there were particular patterns of failure that can be seen across each component. The following plots will detail each one and they will ultimately inform the modeling strategy. 
+
+In the plots below the solid vertical lines are on the day of a component failure, the dashed lines are on the day of a scheduled maintenance and the dotted lines represent the day an error was tripped.
+"""
+
+
+telemetry_component_one_text = """
+### Component 1 Failure Signatures
+
+A common pattern shown for a component 1 failure is that there is a spike in the **Voltage** and **Error 1** is tripped the previous day. This persists throughout the dataset and can be seen in the example below.
+
+**Machine ID 79**
+
+
+"""
+
+
+telemetry_component_two_text = """### Component 2 Failure Signatures
+
+A common pattern shown for a component 2 failure is that there is a dip in the **Rotation** and **Error 2 and Error 3** are tripped the previous day. This persists throughout the dataset and can be seen in the example below.
+
+**Machine ID 23**"""
+
+telemetry_component_three_text = """
+### Component 3 Failure Signatures
+
+A common pattern shown for a component 3 failure is that there is a spike in the **Pressure** and **Error 4** is tripped the previous day. This persists throughout the dataset and can be seen in the example below.
+
+**Machine ID 42** 😉
+"""
+
+
+telemetry_component_four_text = """
+### Component 4 Failure Signatures
+
+A common pattern shown for a **component 4 failure** is that there is a spike in the **Vibration** and **Error 5** is tripped the previous day. This persists throughout the dataset and can be seen in the example below.
+
+**Machine ID 51**"""
+
+
+feature_text = """## Features To Be Used For COX PH Model
+
+From the analysis of the telemetry data, it was discovered that each component prior to failure tends to show a large **Spike** or **Dip** in a specific telemetry value around 2 days before the component is replaced due to failure.  
+
+To capture these deviations more robustly, I will compute **21-day rolling means and rolling standard deviations** for each telemetry variable and then calculate a **z-score** for the current day's reading relative to the past 21 days. If the **z-score** on a given day is over a certain threshold... say 2.5, that day will be flagged as being an anomalous telemetry measurement and used as a time varying predictor in the model.
+
+Using these anomaly flags, I will train **4 COX PH models** (one for each component) with:
+- **Fixed variables**: Machine model type and machine age  
+- **Time-varying predictor**: 21-day rolling z-score anomaly flag which will be a binary 0 or 1
+
+Below are the components and their associated telemetry signals:
+
+- **Component 1** → Spike in Voltage  
+- **Component 2** → Dip in Rotation  
+- **Component 3** → Spike in Pressure  
+- **Component 4** → Spike in Vibration
+
+
+**The z-score calculation is performed in the cell below**"""
