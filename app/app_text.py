@@ -69,7 +69,7 @@ Survival analysis has its roots in the life sciences, think clinical trials and 
 **Survival Functions**   
 Whatever label you slap on it, the core question remains the same: **How long until something important happens?**
 
-In this framework, Itrack a subject say, a machine component, from a known start time, and Ieither observe it fail (mission accomplished) or... nothing happens. That’s fine too. One of the quirks (and strengths) of time to event analysis is the concept of censoring  when the event hasn’t happened yet, but Istill know how long it took to **NOT** happen. That’s useful information! It's like saying: “I didn’t catch fire today.” Good to know.
+In this framework, you track a subject say, a machine component, from a known start time, and either observe it fail (mission accomplished) or... nothing happens. That’s fine too. One of the quirks (and strengths) of time to event analysis is the concept of censoring  when the event hasn’t happened yet, but you still know how long it took to **NOT** happen. That’s useful information! It's like saying: “I didn’t catch fire today.” Good to know.
 
 Mathematically, the survival function $𝑆(𝑡)$  gives us the probability that the event of interest hasn’t occurred by time **t:** $$S(t)=P(T>t)=1−F(t)$$
 
@@ -96,11 +96,11 @@ Where:
 
 Think of  $h(t)$ as the **failure intensity**: how risky it is to still be alive (or operating) at time $t$.
 
-For this notebook, we’ll focus on machine components. Some fail and get swapped out **(Event of Interest)**, while others are replaced preemptively during routine maintenance **(Censored Observations)**.
+For this demonstration, I will focus on machine components. Some fail and get swapped out **(Event of Interest)**, while others are replaced preemptively during routine maintenance **(Censored Observations)**.
 
-So imagine we’ve got a cohort of machines in an industrial setting. Ilet them run and track how long they last before failing, up to 45 days. Some don’t make it, others are still kicking by the end of the observation window. Below, we’ve got two plots to visualize this:
+So imagine there is a cohort of machines in an industrial setting. And we let them run and track how long they last before failing, up to 45 days. Some don’t make it, others are still kicking by the end of the observation window. Below, we’ve got two plots to visualize this:
 
-On the left, a lollipop plot showing each machine’s "lifetime" (with ✖️ for failure and 🟠 for censoring).
+On the left, a lollipop plot showing each machine’s "lifetime" (with ❌ for failure and 🔵 for censoring).
 
 In the middle, a fitted Weibull Survival Curve
 
