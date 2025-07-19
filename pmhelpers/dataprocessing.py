@@ -107,10 +107,10 @@ def create_train_test_df(
     because we are looking for the signal to provide an early warning of machine failure.
     """
     telemetry_columns = [
-        "mean_daily_voltage",
-        "mean_daily_rotation",
-        "mean_daily_pressure",
-        "mean_daily_vibration",
+        "anomaly_flag_21d_mean_daily_voltage",
+        "anomaly_flag_21d_mean_daily_rotation",
+        "anomaly_flag_21d_mean_daily_pressure",
+        "anomaly_flag_21d_mean_daily_vibration",
     ]
     train_df = (
         df.filter(pl.col("date") < split_date)
