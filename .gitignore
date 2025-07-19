@@ -14,3 +14,6 @@ __pycache__/
 
 # Jupyter
 .ipynb_checkpoints/
+
+# Big Data CSVs
+*_model_data.csv
