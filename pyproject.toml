@@ -12,7 +12,7 @@ dependencies = [
     "matplotlib",
     "seaborn",
     "lifelines",
-    "polars",
+    "polars==0.20.30",
     "scikit-learn",
     "plotly",
     "jupyterlab",
