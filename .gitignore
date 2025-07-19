@@ -16,4 +16,4 @@ __pycache__/
 .ipynb_checkpoints/
 
 # Big Data CSVs
-*_model_data.csv
+*model_data.csv
