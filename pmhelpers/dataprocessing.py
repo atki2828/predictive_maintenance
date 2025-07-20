@@ -1,4 +1,5 @@
 from datetime import datetime
+from functools import reduce
 from typing import List
 
 import numpy as np
@@ -297,4 +298,70 @@ def create_daily_component_fail_df(
             ]
         )
         .with_columns((pl.col("start") + 1).alias("end"))
+    )
+
+
+def create_fail_prob_dash_demo_df(df: pl.DataFrame) -> pl.DataFrame:
+    df_list = [
+        df.filter(pl.col("comp") == comp)
+        .select(["date", "machineID", f"{comp}_failure_proba"])
+        .unique()
+        for comp in ["comp1", "comp2", "comp3", "comp4"]
+    ]
+    return reduce(
+        lambda left, right: left.join(right, on=["date", "machineID"], how="inner"),
+        df_list,
+    )
+
+
+def create_comp_dash_demo_df(df: pl.DataFrame) -> pl.DataFrame:
+    result = (
+        df.select(
+            [
+                "machineID",
+                "date",
+                "comp",
+                "component_instance_id",
+                "component_instance",
+                "start",
+                "end",
+            ]
+        )
+        .with_columns(
+            pl.col("date")
+            .first()
+            .over("component_instance_id")
+            .alias("component_install_date")
+        )
+        .pivot(
+            index=["machineID", "date"],
+            columns="comp",
+            values=["end", "component_instance", "component_install_date"],
+            aggregate_function="first",
+        )
+    )
+
+    result.columns = [col.replace("_comp_", "_") for col in result.columns]
+
+    return result
+
+
+def create_telemetry_dash_demo_df(df: pl.DataFrame) -> pl.DataFrame:
+    return (
+        df.drop(
+            [
+                "comp",
+                "component_instance_id",
+                "component_instance",
+                "start",
+                "end",
+                "component_failure",
+                "comp1_failure_proba",
+                "comp2_failure_proba",
+                "comp3_failure_proba",
+                "comp4_failure_proba",
+            ]
+        )
+        .unique()
+        .sort("date", descending=False)
     )
