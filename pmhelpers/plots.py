@@ -115,7 +115,11 @@ def plot_timeseries_stacked(
             )
 
     axes[0].legend(
-        handles=legend_lines, loc="upper left", ncol=1, bbox_to_anchor=(1.01, 0)
+        handles=legend_lines,
+        loc="upper left",
+        ncol=1,
+        bbox_to_anchor=(1.01, 0),
+        title="Telemetry Event Legend",
     )
     axes[-1].set_xlabel("Date")
     plt.tight_layout()
