@@ -7,6 +7,7 @@ from pmhelpers.plots import generate_survival_curv_example_fig
 
 
 def main():
+    st.set_page_config(layout="wide")
     st.markdown(theory_intro)
     st.divider()
     survival_example_fig = generate_survival_curv_example_fig()

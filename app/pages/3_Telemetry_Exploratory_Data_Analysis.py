@@ -34,6 +34,7 @@ def create_plot_df(
 
 
 def main():
+    st.set_page_config(layout="wide")
     # Load data
     comp_fail_plot_daily_df = load_data(DAILY_PLOT_DATA_PATH)
     # Set mean sensor cols
