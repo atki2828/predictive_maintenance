@@ -18,6 +18,7 @@ st.title("Machine Maintenance Prioritization Dashboard")
 st.subheader("Input Parameters")
 col1, col2, col3 = st.columns(3)
 
+machine_selection = None
 with col1:
     selected_date = st.date_input(
         "Select Date:", value=None, min_value=min_date, max_value=max_date
@@ -194,40 +195,49 @@ if selected_date and top_n:
 
     st.divider()
 # Example selected row
+if machine_selection is not None:
+    row = machine_analysis_df.to_pandas().iloc[-1]
 
-row = machine_analysis_df.to_pandas().iloc[-1]
+    # Components
+    components = ["comp1", "comp2", "comp3", "comp4"]
 
-# Components
-components = ["comp1", "comp2", "comp3", "comp4"]
+    # Top-level columns for each component
+    top_cols = st.columns(4)
 
-# Top-level columns for each component
-top_cols = st.columns(4)
-
-for i, comp in enumerate(components):
-    with top_cols[i]:
-        st.markdown(f"### {comp.capitalize()}")
-
-        # Extract values
-        failure_prob = row[f"{comp}_failure_proba"]
-        install_date_raw = row[f"component_install_date_{comp}"]
-        days_running = row[f"end_{comp}"]
-
-        # Format date as Month Day, Year
-        if isinstance(install_date_raw, str):
+    for i, comp in enumerate(components):
+        with top_cols[i]:
+            clicked = st.button(label=comp.capitalize(), icon="🚨")
             try:
-                install_date = datetime.strptime(install_date_raw, "%Y-%m-%d").strftime(
-                    "%b %d, %Y"
-                )
+                if clicked:
+                    comp_plot = comp
             except:
-                install_date = install_date_raw
-        elif isinstance(install_date_raw, datetime):
-            install_date = install_date_raw.strftime("%b %d, %Y")
-        else:
-            install_date = str(install_date_raw)
+                print("Whatever")
 
-        # Display stacked metrics (centered naturally by Streamlit)
-        st.metric(
-            label="2 Day Failure Probability", value=f"{failure_prob:.2%}", border=True
-        )
-        st.metric(label="Install Date", value=install_date, border=True)
-        st.metric(label="Days Running", value=int(days_running), border=True)
+            # Extract values
+            failure_prob = row[f"{comp}_failure_proba"]
+            install_date_raw = row[f"component_install_date_{comp}"]
+            days_running = row[f"end_{comp}"]
+
+            # Format date as Month Day, Year
+            if isinstance(install_date_raw, str):
+                try:
+                    install_date = datetime.strptime(
+                        install_date_raw, "%Y-%m-%d"
+                    ).strftime("%b %d, %Y")
+                except:
+                    install_date = install_date_raw
+            elif isinstance(install_date_raw, datetime):
+                install_date = install_date_raw.strftime("%b %d, %Y")
+            else:
+                install_date = str(install_date_raw)
+
+            # Display stacked metrics (centered naturally by Streamlit)
+            st.metric(
+                label="2 Day Failure Probability",
+                value=f"{failure_prob:.2%}",
+                border=True,
+            )
+            st.metric(label="Install Date", value=install_date, border=True)
+            st.metric(label="Days Running", value=int(days_running), border=True)
+
+print(comp_plot)
