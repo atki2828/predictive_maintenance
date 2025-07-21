@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime, timedelta
 
 import numpy as np
 import pandas as pd
@@ -15,7 +15,7 @@ max_date = total_dash_df.select(pl.col("date").max()).item()
 st.set_page_config(layout="wide")
 st.title("Machine Maintenance Prioritization Dashboard")
 
-st.subheader("Step 1: Input Parameters")
+st.subheader("Input Parameters")
 col1, col2, col3 = st.columns(3)
 
 with col1:
@@ -36,7 +36,7 @@ with col3:
         index=0,
     )
 
-st.markdown("---")
+st.divider()
 
 if selected_date and top_n:
     # --- Setup Display DF ---
@@ -53,7 +53,7 @@ if selected_date and top_n:
 
     # Add SortValue for sorting
     sort_col = "SortValue"
-    if sort_option == "Max Component Probability":
+    if sort_option == "Max Component Failure Probability":
         dash_df = dash_df.with_columns(
             pl.max_horizontal([pl.col(c) for c in fail_prob_cols]).alias(sort_col)
         )
@@ -78,19 +78,22 @@ if selected_date and top_n:
     )
 
     # --- SECTION 2: Show Table ---
-    st.subheader(f"Step 2: Top {top_n} Machines by {sort_option}")
+    st.subheader(f"Top {top_n} Machines by 2 Day Ahead {sort_option}")
+    st.markdown("""**Select Machine ID For Deeper Dive**""")
 
     # Column configs: Progress bar for failure probs, TextColumn for machineID
     column_config = {
         "machineID": st.column_config.TextColumn(
-            "Machine ID", width="small", help="Unique Machine Identifier"
+            "Machine ID",
+            width="small",
+            help="Unique Machine Identifier",
         )
     }
     # Add progress bars for failure probability columns
     column_config.update(
         {
             col: st.column_config.ProgressColumn(
-                col, format="%.2f%%", min_value=0.0, max_value=1.0
+                col, format="percent", min_value=0.0, max_value=1.0
             )
             for col in rename_map.values()
         }
@@ -105,49 +108,126 @@ if selected_date and top_n:
         use_container_width=True,
     )
 
-    st.markdown("---")
+    st.divider()
 
-#     # --- SECTION 3: Dropdown Selections ---
-#     st.subheader("Step 3: Select Machine and Component")
-#     sel_col1, sel_col2 = st.columns(2)
+    print(machine_selection)
 
-#     with sel_col1:
-#         selected_machine = st.selectbox(
-#             "Select Machine ID:", options=[""] + top_df["Machine ID"].tolist()
-#         )
+    ### use this machine_id for a lookup
+    machine_id = display_df.iloc[machine_selection["selection"]["rows"][0]]["machineID"]
+    print(machine_id)
+    machine_analysis_df = total_dash_df.filter(
+        (pl.col("machineID") == machine_id) & (pl.col("date") <= selected_date)
+    )
 
-#     with sel_col2:
-#         selected_component = st.selectbox(
-#             "Select Component:", options=[""] + components
-#         )
+    st.markdown("## 7 Day Error Counts ")
+    st.write(f"Machine ID = {int(machine_id)}")
 
-#     st.markdown("---")
+    print(machine_selection)
 
-#     # --- SECTION 4: Drill-Down ---
-#     if selected_machine and selected_component:
-#         st.subheader("Step 4: Drill-Down Details")
-#         prob = df.loc[df["Machine ID"] == selected_machine, selected_component].values[
-#             0
-#         ]
+    print(machine_analysis_df.columns)
 
-#         # Metrics Row
-#         metric_col1, metric_col2, metric_col3 = st.columns(3)
-#         with metric_col1:
-#             st.metric("Current Status", "Running")
-#         with metric_col2:
-#             st.metric("Mean Time to Failure", f"{np.random.randint(10,50)} days")
-#         with metric_col3:
-#             st.metric("Last Maintenance", str(date.today()))
+    (
+        error_col1,
+        error_col2,
+        error_col3,
+        error_col4,
+        error_col5,
+    ) = st.columns(5)
 
-#         # Chart for all component probabilities
-#         st.write("#### Component Probabilities for Selected Machine")
-#         component_probs = df.loc[df["Machine ID"] == selected_machine, components].melt(
-#             var_name="Component", value_name="Failure Probability"
-#         )
-#         st.bar_chart(component_probs.set_index("Component"))
+    with error_col1:
+        error_count = (
+            machine_analysis_df.filter(
+                pl.col("date").is_between(
+                    selected_date - timedelta(days=7), selected_date
+                )
+            )
+            .select("error1")
+            .sum()
+            .item()
+        )
+        print(error_count)
+        st.metric(label="Error 1", value=error_count, border=True)
+    with error_col2:
+        error_count = (
+            machine_analysis_df.filter(
+                pl.col("date").is_between(
+                    selected_date - timedelta(days=7), selected_date
+                )
+            )
+            .select("error2")
+            .sum()
+        )
+        st.metric(label="Error 2", value=error_count, border=True)
+    with error_col3:
+        error_count = (
+            machine_analysis_df.filter(
+                pl.col("date").is_between(
+                    selected_date - timedelta(days=7), selected_date
+                )
+            )
+            .select("error3")
+            .sum()
+        )
+        st.metric(label="Error 3", value=error_count, border=True)
+    with error_col4:
+        error_count = (
+            machine_analysis_df.filter(
+                pl.col("date").is_between(
+                    selected_date - timedelta(days=7), selected_date
+                )
+            )
+            .select("error4")
+            .sum()
+        )
+        st.metric(label="Error 4", value=error_count, border=True)
+    with error_col5:
+        error_count = (
+            machine_analysis_df.filter(
+                pl.col("date").is_between(
+                    selected_date - timedelta(days=7), selected_date
+                )
+            )
+            .select("error5")
+            .sum()
+        )
+        st.metric(label="Error 5", value=error_count, border=True)
 
-#     else:
-#         st.info("Please select both Machine ID and Component to view details.")
+    st.divider()
+# Example selected row
 
-else:
-    st.warning("Please select a date and enter a valid Top N number to proceed.")
+row = machine_analysis_df.to_pandas().iloc[-1]
+
+# Components
+components = ["comp1", "comp2", "comp3", "comp4"]
+
+# Top-level columns for each component
+top_cols = st.columns(4)
+
+for i, comp in enumerate(components):
+    with top_cols[i]:
+        st.markdown(f"### {comp.capitalize()}")
+
+        # Extract values
+        failure_prob = row[f"{comp}_failure_proba"]
+        install_date_raw = row[f"component_install_date_{comp}"]
+        days_running = row[f"end_{comp}"]
+
+        # Format date as Month Day, Year
+        if isinstance(install_date_raw, str):
+            try:
+                install_date = datetime.strptime(install_date_raw, "%Y-%m-%d").strftime(
+                    "%b %d, %Y"
+                )
+            except:
+                install_date = install_date_raw
+        elif isinstance(install_date_raw, datetime):
+            install_date = install_date_raw.strftime("%b %d, %Y")
+        else:
+            install_date = str(install_date_raw)
+
+        # Display stacked metrics (centered naturally by Streamlit)
+        st.metric(
+            label="2 Day Failure Probability", value=f"{failure_prob:.2%}", border=True
+        )
+        st.metric(label="Install Date", value=install_date, border=True)
+        st.metric(label="Days Running", value=int(days_running), border=True)
