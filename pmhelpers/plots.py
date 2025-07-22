@@ -3,10 +3,12 @@ from typing import Union
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import plotly.graph_objects as go
 import polars as pl
 import seaborn as sns
 from lifelines import CoxPHFitter, CoxTimeVaryingFitter, WeibullFitter
 from matplotlib.lines import Line2D
+from plotly.subplots import make_subplots
 
 
 def plot_box_and_strip(
@@ -288,4 +290,113 @@ def plot_time_between_maintenance_dist(df: pl.DataFrame) -> plt.Figure:
     ax.set_ylabel("Frequency", fontsize=12)
 
     fig.tight_layout()
+    return fig
+
+
+def plot_timeseries_stacked_plotly(
+    df: pd.DataFrame, sensors: list, time_col="date", machine_id=None
+):
+    if isinstance(df, pl.DataFrame):
+        df = df.to_pandas()
+
+    if machine_id is not None and "machineID" in df.columns:
+        df = df[df["machineID"] == machine_id]
+
+    # Event style definitions
+    event_styles = {
+        "error": {
+            "columns": ["error1", "error2", "error3", "error4", "error5"],
+            "colors": ["orange", "blueviolet", "brown", "firebrick", "violet"],
+            "dash": "dot",
+        },
+        "failure": {
+            "columns": [
+                "comp1_failure",
+                "comp2_failure",
+                "comp3_failure",
+                "comp4_failure",
+            ],
+            "colors": ["red", "green", "black", "blue"],
+            "dash": "solid",
+        },
+        "maintenance": {
+            "columns": ["comp1", "comp2", "comp3", "comp4"],
+            "colors": ["red", "green", "black", "blue"],
+            "dash": "dash",
+        },
+    }
+
+    # Create stacked subplots
+    n = len(sensors)
+    fig = make_subplots(
+        rows=n,
+        cols=1,
+        shared_xaxes=True,
+        vertical_spacing=0.05,
+        subplot_titles=[s.replace("_", " ").title() for s in sensors],
+    )
+
+    # Add sensor time series
+    for i, sensor in enumerate(sensors, start=1):
+        fig.add_trace(
+            go.Scatter(
+                x=df[time_col],
+                y=df[sensor],
+                mode="lines",
+                name=sensor.replace("_", " ").title(),
+                line=dict(color="#1f77b4", width=2),
+            ),
+            row=i,
+            col=1,
+        )
+
+    # Add vertical event lines
+    legend_items = []
+    for event_type in ["failure", "maintenance", "error"]:  # order matters
+        style = event_styles[event_type]
+        for col, color in zip(style["columns"], style["colors"]):
+            event_times = df.loc[df[col] == 1, time_col]
+            for t in event_times:
+                fig.add_vline(
+                    x=t.strftime("%Y-%m-%d"),
+                    line_width=1.5,
+                    line_dash=style["dash"],
+                    line_color=color,
+                    annotation_text=None,
+                )
+            # Add legend item (fake trace for legend)
+            legend_items.append(
+                go.Scatter(
+                    x=[None],
+                    y=[None],
+                    mode="lines",
+                    line=dict(color=color, dash=style["dash"], width=2),
+                    name=col.replace("_", " "),
+                )
+            )
+
+    # Add legend items as invisible traces
+    for item in legend_items:
+        fig.add_trace(item, row=1, col=1)
+
+    # Layout settings for Streamlit look
+    fig.update_layout(
+        height=300 * n,
+        title="Telemetry Time Series",
+        template="plotly_white",
+        legend=dict(
+            orientation="v",
+            yanchor="top",
+            y=1,
+            xanchor="left",
+            x=1.02,
+            title="Telemetry Event Legend",
+        ),
+        margin=dict(l=40, r=200, t=60, b=40),
+    )
+
+    # Update axis labels
+    fig.update_xaxes(title_text="Date", row=n, col=1)
+    fig.update_yaxes(title_text="", showgrid=True)
+
     return fig

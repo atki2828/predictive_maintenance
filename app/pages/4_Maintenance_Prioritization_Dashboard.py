@@ -2,10 +2,136 @@ from datetime import date, datetime, timedelta
 
 import numpy as np
 import pandas as pd
+import plotly.graph_objects as go
 import polars as pl
 import streamlit as st
+from plotly.subplots import make_subplots
 
 from pmhelpers.dataprocessing import load_data
+
+# from pmhelpers.plots import plot_timeseries_stacked_plotly
+
+
+def plot_timeseries_stacked_plotly(
+    df: pd.DataFrame, sensors: list, time_col="date", machine_id=None
+):
+    # Convert Polars to Pandas if needed
+    if isinstance(df, pl.DataFrame):
+        df = df.to_pandas()
+
+    # Filter by machine ID if provided
+    if machine_id is not None and "machineID" in df.columns:
+        df = df[df["machineID"] == machine_id]
+
+    # Define event styles
+    event_styles = {
+        "error": {
+            "columns": ["error1", "error2", "error3", "error4", "error5"],
+            "colors": ["orange", "blueviolet", "brown", "firebrick", "violet"],
+            "dash": "dot",
+        },
+        "failure": {
+            "columns": [
+                "comp1_failure",
+                "comp2_failure",
+                "comp3_failure",
+                "comp4_failure",
+            ],
+            "colors": ["red", "green", "black", "blue"],
+            "dash": "solid",
+        },
+        "maintenance": {
+            "columns": ["comp1", "comp2", "comp3", "comp4"],
+            "colors": ["red", "green", "black", "blue"],
+            "dash": "dash",
+        },
+    }
+
+    # Create stacked subplots
+    n = len(sensors)
+    fig = make_subplots(
+        rows=n,
+        cols=1,
+        shared_xaxes=True,
+        vertical_spacing=0.05,
+        subplot_titles=[s.replace("_", " ").title() for s in sensors],
+    )
+
+    # Add sensor time series
+    for i, sensor in enumerate(sensors, start=1):
+        fig.add_trace(
+            go.Scatter(
+                x=df[time_col],
+                y=df[sensor],
+                mode="lines",
+                name=sensor.replace("_", " ").title(),
+                line=dict(color="#1f77b4", width=2),
+                showlegend=False,  # legend for events only
+            ),
+            row=i,
+            col=1,
+        )
+
+    # Build legend items (one copy per event type/color)
+    legend_items = []
+    for event_type in ["failure", "maintenance", "error"]:
+        style = event_styles[event_type]
+        for col, color in zip(style["columns"], style["colors"]):
+            legend_items.append(
+                go.Scatter(
+                    x=[None],
+                    y=[None],
+                    mode="lines",
+                    line=dict(color=color, dash=style["dash"], width=2),
+                    name=col.replace("_", " "),
+                )
+            )
+
+    # Add all legend traces
+    for item in legend_items:
+        fig.add_trace(item, row=1, col=1)
+
+    # Add vertical event lines per subplot
+    for i, sensor in enumerate(sensors, start=1):
+        yref = f"y{i}" if i > 1 else "y"
+        for event_type in ["failure", "maintenance", "error"]:
+            style = event_styles[event_type]
+            for col, color in zip(style["columns"], style["colors"]):
+                event_times = df.loc[df[col] == 1, time_col]
+                for t in event_times:
+                    fig.add_shape(
+                        type="line",
+                        x0=t,
+                        x1=t,
+                        y0=df[sensor].min(),
+                        y1=df[sensor].max(),
+                        xref="x",
+                        yref=yref,
+                        line=dict(color=color, dash=style["dash"], width=1.5),
+                    )
+
+    # Layout for Streamlit look
+    fig.update_layout(
+        height=260 * n,
+        title="Telemetry Time Series",
+        template="plotly_white",
+        legend=dict(
+            orientation="v",
+            yanchor="top",
+            y=1,
+            xanchor="left",
+            x=1.02,
+            title="Event Legend",
+        ),
+        margin=dict(l=40, r=200, t=60, b=40),
+    )
+
+    # Update axis labels
+    fig.update_xaxes(title_text="Date", row=n, col=1)
+    fig.update_yaxes(title_text="", showgrid=True)
+
+    return fig
+
 
 DASH_DATA_PATH = "./data/dash_demo.csv"
 total_dash_df = load_data(DASH_DATA_PATH)
@@ -196,6 +322,7 @@ if selected_date and top_n:
     st.divider()
 # Example selected row
 if machine_selection is not None:
+    comp_plot = None
     row = machine_analysis_df.to_pandas().iloc[-1]
 
     # Components
@@ -210,10 +337,9 @@ if machine_selection is not None:
             try:
                 if clicked:
                     comp_plot = comp
-            except:
-                print("Whatever")
+            except Exception as e:
+                print(e)
 
-            # Extract values
             failure_prob = row[f"{comp}_failure_proba"]
             install_date_raw = row[f"component_install_date_{comp}"]
             days_running = row[f"end_{comp}"]
@@ -239,5 +365,19 @@ if machine_selection is not None:
             )
             st.metric(label="Install Date", value=install_date, border=True)
             st.metric(label="Days Running", value=int(days_running), border=True)
+            #### Plotting Code Check
+    sensors = [
+        "mean_daily_vibration",
+        "comp4_failure_proba",
+    ]
+    comp_sensor_lookup = {
+        "comp1": ["mean_daily_voltage", "comp1_failure_proba"],
+        "comp2": ["mean_daily_rotation", "comp2_failure_proba"],
+        "comp3": ["mean_daily_pressure", "comp3_failure_proba"],
+        "comp4": ["mean_daily_vibration", "comp4_failure_proba"],
+    }
 
-print(comp_plot)
+    if comp_plot is not None:
+        sensors = comp_sensor_lookup.get(comp_plot)
+        plot_fig = plot_timeseries_stacked_plotly(machine_analysis_df, sensors=sensors)
+        st.plotly_chart(plot_fig)
