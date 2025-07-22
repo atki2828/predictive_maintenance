@@ -1,3 +1,7 @@
+"""
+This file is all of the markdown used throughout the app.
+"""
+
 intro = """    
 ## Problem Statement
 

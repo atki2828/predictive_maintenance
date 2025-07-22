@@ -37,7 +37,7 @@ TIME_TO_FAIL_PATH = "./data/time_to_fail.csv"
 
 def main():
     # Read and Cache Data
-    st.set_page_config(layout="wide")
+    st.set_page_config(layout="centered", page_icon="🔎")
     comp_fail_plot_df = load_data(COMP_FAIL_PLOT_PATH)
     mach_fail_plot_df = load_data(MACHINE_FAIL_PLOT_PATH)
     time_to_fail_df = load_data(TIME_TO_FAIL_PATH)
