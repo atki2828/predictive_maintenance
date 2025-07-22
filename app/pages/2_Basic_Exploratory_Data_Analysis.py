@@ -11,6 +11,7 @@ from app_text import (
     weibull_survival_text,
 )
 from lifelines import WeibullFitter
+
 from pmhelpers.dataprocessing import load_data
 from pmhelpers.models import create_survival_model_dict
 from pmhelpers.plots import (
@@ -37,7 +38,6 @@ def main():
     # Read and Cache Data
     st.set_page_config(layout="centered", page_icon="🔎")
     comp_fail_plot_df = load_data(COMP_FAIL_PLOT_PATH)
-    mach_fail_plot_df = load_data(MACHINE_FAIL_PLOT_PATH)
     time_to_fail_df = load_data(TIME_TO_FAIL_PATH)
     time_between_comp_fail_flag_df = load_data(TIME_BETWEEN_FAIL_FLAG_PATH)
     component_weibull_dict = create_survival_model_dict(

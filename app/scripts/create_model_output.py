@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 import polars as pl
 from lifelines import CoxTimeVaryingFitter
 
-from app.pmhelpers.dataprocessing import create_train_test_df
-from app.pmhelpers.models import create_val_analysis_df, train_component_models
+from pmhelpers.dataprocessing import create_train_test_df
+from pmhelpers.models import create_val_analysis_df, train_component_models
 
 plt.style.use("ggplot")
 
