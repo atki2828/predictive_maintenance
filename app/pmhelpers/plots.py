@@ -85,7 +85,6 @@ def plot_box_and_strip(
     )
 
     ax.set_title(title)
-    plt.tight_layout()
     return fig
 
 
@@ -139,7 +138,6 @@ def survival_hazard_group_plotter(
     ax[1].set_ylabel("Hazard")
     ax[1].legend(title="Group")
 
-    plt.tight_layout()
     return fig
 
 
@@ -267,7 +265,7 @@ def plot_timeseries_stacked(
     )
 
     axes[-1].set_xlabel("Date")
-    plt.tight_layout()
+
     return fig
 
 
@@ -292,7 +290,6 @@ def plot_top_cox_predictors(
     plt.axvline(0, color="black", linestyle="--")
     plt.title(title)
     plt.xlabel("Coefficient (log hazard ratio)")
-    plt.tight_layout()
     plt.show()
 
 

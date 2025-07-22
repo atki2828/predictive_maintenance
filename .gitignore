@@ -18,3 +18,4 @@ __pycache__/
 # Big Data CSVs
 *model_data.csv
 *validation_analysis.csv
+*.csv
