@@ -1,18 +1,19 @@
-intro = """
-### A Statistical Approach Using Survival Regression      
-In the realm of practical **predictive maintenance** use cases, it's tempting for data teams to jump straight into **deep learning models**. But recently, I’ve been working with the **Cox Proportional Hazards model with time-varying covariates**, a model rooted in **Survival Analysis**, from the `lifelines` python package, and have discovered it can be an excellent choice on any predictive maintenance use case that entails incorporating telemetry **IoT** signals. It’s interpretable, efficient, and importantly, already familiar to many reliability and quality engineers.
+intro = """    
+## Problem Statement
 
-This `streamlit` app explores the Azure Predictive Maintenance dataset to show how a **Cox PH** model can be developed and deployed in a real-world scenario to support smarter maintenance decisions.
+Imagine this real-world scenario: A maintenance or field services team manages a fleet of thousands of machines, each with multiple components that may fail over time. Every morning, the team must decide which machines and components to prioritize for maintenance. Inspecting every machine daily is impossible, and the team desperately needs a data driven way to allocate resources effectively. This challenge is common and represents a perfect opportunity to implement **predictive maintenance** solutions.
 
-I will demonstrate how to extend the **Cox PH** approach with time-varying covariates to model the **probability of a component failure within the next 2 days** as a sample use case. This example illustrates how maintenance teams can leverage these tools to prioritize their work more effectively based on dynamic risk estimates and incorporating ever changing **telemetry data**.
+While it can be tempting for data teams to jump straight into **deep learning models**, I’ve been exploring a different approach: the **Cox Proportional Hazards (Cox PH) model with time-varying covariates** using the `lifelines` Python library. This method is highly interpretable, computationally efficient, and familiar to many reliability and quality engineers. It also integrates well with telemetry **IoT signals**, making it ideal for predictive maintenance.
 
-Before diving in, here’s why this modeling approach is so well-suited for predictive maintenance:
+In this app, we’ll use the **Azure Predictive Maintenance dataset** to demonstrate how a Cox PH model can be developed and deployed to support smarter maintenance decisions. Specifically, I’ll show how to extend the model with time-varying covariates to estimate the **probability of a component failing within the next 2 days**, a practical use case that empowers teams to prioritize work based on dynamic risk estimates informed by real-time telemetry.
 
-✅ Combines static attributes (e.g., manufacturer, install date) with real-time telemetry from sensors   
-✅ Easily integrated into production pipelines using Python and open-source tools like lifelines   
-✅ Can yield failure probabilities with a bit of post-processing   
-✅ Naturally handles class imbalance and censored data, both common in real-world maintenance settings   
-✅ Bridges the gap between data science teams and reliability engineers who already use these models in tools like JMP or Minitab as Lifelines now scalable and automatable in Python
+Before diving in, here’s why this modeling approach stands out:
+
+✅ Combines static attributes (e.g., manufacturer, install date) with real-time telemetry data  
+✅ Easily integrates into production pipelines using Python and open-source tools like `lifelines`  
+✅ Produces actionable failure probabilities with minimal post-processing  
+✅ Handles censored data and class imbalance—both common in maintenance scenarios  
+✅ Bridges the gap between data science teams and reliability engineers familiar with these models in tools like JMP or Minitab, now with scalable and automatable Python workflows  
 """
 
 app_overview = """
