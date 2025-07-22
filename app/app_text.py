@@ -52,13 +52,11 @@ app_overview = """
 
     ---
 
-    ### ⚙️ Page 4: **Production Dashboard**
-    Simulate and view model outputs as they would appear in a production setting.  
-    Includes:
-    - **Failure risk scores**
-    - **Priority rankings**
-    - Example real-time KPIs
-
+    ### ⚙️ Page 4: **Production Dashboard**   
+    Interactive Production Dashboard Example   
+    - Select day   
+    - Analyze **most** at risk machines   
+    - **Deep dive on model outputs** 
     ---
 
     #### 📚 Want More Detail?
@@ -169,7 +167,7 @@ The available data includes:
 
 ---
 
-The goal of this **EDA** is to identify **early warning signals** of component failure that can serve as covariates in a **Cox Proportional Hazards (Cox PH)** model. We'll explore patterns and trends in telemetry data, error codes, and maintenance history to better understand the **failure dynamics** and prepare the data for survival modeling."""
+The goal of this **EDA** is to analyze the distribution of time to failure in order to inform the **Cox Proportional Hazards (Cox PH)** model. We'll explore patterns and trends in telemetry data, error codes, and maintenance history to better understand the **failure dynamics** and prepare the data for survival modeling."""
 
 component_failure_text = """### Component Failures Across Machines 
 

@@ -616,42 +616,77 @@ def plot_timeseries_stacked_plotly(
         subplot_titles=[s.replace("_", " ").title() for s in sensors],
     )
 
-    # Add sensor traces
+    # Add sensor time series
     for i, sensor in enumerate(sensors, start=1):
-        if sensor in df.columns:
-            fig.add_trace(
+        fig.add_trace(
+            go.Scatter(
+                x=df[time_col],
+                y=df[sensor],
+                mode="lines",
+                name=sensor.replace("_", " ").title(),
+                line=dict(color="#1f77b4", width=2),
+                showlegend=False,  # legend for events only
+            ),
+            row=i,
+            col=1,
+        )
+
+    # Build legend items (one copy per event type/color)
+    legend_items = []
+    for event_type in ["failure", "maintenance", "error"]:
+        style = event_styles[event_type]
+        for col, color in zip(style["columns"], style["colors"]):
+            legend_items.append(
                 go.Scatter(
-                    x=df[time_col],
-                    y=df[sensor],
+                    x=[None],
+                    y=[None],
                     mode="lines",
-                    name=sensor,
-                ),
-                row=i,
-                col=1,
+                    line=dict(color=color, dash=style["dash"], width=2),
+                    name=col.replace("_", " "),
+                )
             )
 
-    # Add event markers (errors, failures, maintenance)
-    for event_type, style in event_styles.items():
-        for col, color in zip(style["columns"], style["colors"]):
-            if col in df.columns:
-                for i, sensor in enumerate(sensors, start=1):
-                    fig.add_trace(
-                        go.Scatter(
-                            x=df.loc[df[col] == 1, time_col],
-                            y=[df[sensor].mean()] * sum(df[col] == 1),
-                            mode="markers",
-                            marker=dict(color=color, size=8, symbol="x"),
-                            name=f"{event_type}: {col}",
-                        ),
-                        row=i,
-                        col=1,
+    # Add all legend traces
+    for item in legend_items:
+        fig.add_trace(item, row=1, col=1)
+
+    # Add vertical event lines per subplot
+    for i, sensor in enumerate(sensors, start=1):
+        yref = f"y{i}" if i > 1 else "y"
+        for event_type in ["failure", "maintenance", "error"]:
+            style = event_styles[event_type]
+            for col, color in zip(style["columns"], style["colors"]):
+                event_times = df.loc[df[col] == 1, time_col]
+                for t in event_times:
+                    fig.add_shape(
+                        type="line",
+                        x0=t,
+                        x1=t,
+                        y0=df[sensor].min(),
+                        y1=df[sensor].max(),
+                        xref="x",
+                        yref=yref,
+                        line=dict(color=color, dash=style["dash"], width=1.5),
                     )
 
-    # Update layout
+    # Layout for Streamlit look
     fig.update_layout(
-        height=300 * n,
-        title_text="Sensor Time Series with Events",
-        showlegend=True,
+        height=260 * n,
+        title="Telemetry Time Series",
+        template="plotly_white",
+        legend=dict(
+            orientation="v",
+            yanchor="top",
+            y=1,
+            xanchor="left",
+            x=1.02,
+            title="Event Legend",
+        ),
+        margin=dict(l=40, r=200, t=60, b=40),
     )
+
+    # Update axis labels
+    fig.update_xaxes(title_text="Date", row=n, col=1)
+    fig.update_yaxes(title_text="", showgrid=True)
 
     return fig

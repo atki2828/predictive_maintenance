@@ -199,7 +199,7 @@ def render_component_cards(
             # Show metrics
             st.metric(
                 "2 Day Failure Probability",
-                f"{failure_prob:.2%}" if failure_prob else "N/A",
+                f"{failure_prob:.1%}" if failure_prob else "0",
                 border=True,
             )
             st.metric("Install Date", install_date, border=True)

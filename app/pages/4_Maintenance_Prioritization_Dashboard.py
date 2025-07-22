@@ -17,6 +17,12 @@ from pmhelpers.dataprocessing import load_data
 from pmhelpers.plots import plot_timeseries_stacked_plotly
 
 DASH_DATA_PATH = "./data/dash_demo.csv"
+COMP_SENSOR_LOOKUP = {
+    "comp1": ["mean_daily_voltage", "comp1_failure_proba"],
+    "comp2": ["mean_daily_rotation", "comp2_failure_proba"],
+    "comp3": ["mean_daily_pressure", "comp3_failure_proba"],
+    "comp4": ["mean_daily_vibration", "comp4_failure_proba"],
+}
 
 
 def main():
@@ -25,11 +31,10 @@ def main():
     min_date = total_dash_df.select(pl.col("date").min()).item()
     max_date = total_dash_df.select(pl.col("date").max()).item() - timedelta(days=1)
 
-    st.set_page_config(layout="wide", page_icon="🔎")
+    st.set_page_config(layout="wide", page_icon="⚙️")
     st.title("Machine Maintenance Prioritization Dashboard")
     st.subheader("Input Parameters")
-
-    col1, col2, col3 = st.columns(3)
+    # Initialize machine selection as none for app control flow
     machine_selection = None
     selected_date, top_n, sort_option = render_input_section(
         min_date=min_date, max_date=max_date
@@ -58,15 +63,8 @@ def main():
             st.divider()
             comp_plot = render_component_cards(machine_analysis_df=machine_analysis_df)
 
-            comp_sensor_lookup = {
-                "comp1": ["mean_daily_voltage", "comp1_failure_proba"],
-                "comp2": ["mean_daily_rotation", "comp2_failure_proba"],
-                "comp3": ["mean_daily_pressure", "comp3_failure_proba"],
-                "comp4": ["mean_daily_vibration", "comp4_failure_proba"],
-            }
-
             if comp_plot is not None:
-                sensors = comp_sensor_lookup.get(comp_plot)
+                sensors = COMP_SENSOR_LOOKUP.get(comp_plot)
                 plot_fig = plot_timeseries_stacked_plotly(
                     machine_analysis_df, sensors=sensors
                 )

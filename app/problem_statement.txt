@@ -1,2 +1,0 @@
-Problem Statement: Create a Maintenance Prioritization Dashboard For A Maintenace Team That Has A Daily Meeting To Determine A Course Of Action
-Use a Model that Can take into account Time Varying Covariates To Inform This
