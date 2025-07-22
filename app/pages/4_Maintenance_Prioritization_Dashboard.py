@@ -25,7 +25,7 @@ def main():
     min_date = total_dash_df.select(pl.col("date").min()).item()
     max_date = total_dash_df.select(pl.col("date").max()).item() - timedelta(days=1)
 
-    st.set_page_config(layout="wide")
+    st.set_page_config(layout="wide", page_icon="🔎")
     st.title("Machine Maintenance Prioritization Dashboard")
     st.subheader("Input Parameters")
 

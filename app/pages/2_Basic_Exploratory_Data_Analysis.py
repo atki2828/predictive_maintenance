@@ -17,7 +17,6 @@ from pmhelpers.models import create_survival_model_dict
 from pmhelpers.plots import (
     plot_box_and_strip,
     plot_failure_counts,
-    plot_machine_failure_counts,
     plot_time_between_failures_dist,
     survival_hazard_group_plotter,
 )
@@ -57,12 +56,6 @@ def main():
     failure_count_fig = plot_failure_counts(comp_fail_plot_df)
     st.markdown(component_failure_text)
     st.pyplot(failure_count_fig)
-    st.divider()
-
-    # Machine Failure Count Plot
-    st.markdown(all_machine_failures_text)
-    machine_fail_count_fig = plot_machine_failure_counts(mach_fail_plot_df)
-    st.pyplot(machine_fail_count_fig)
     st.divider()
 
     # Time To Failure dist
