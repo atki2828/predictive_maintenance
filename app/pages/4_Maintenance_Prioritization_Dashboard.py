@@ -6,6 +6,8 @@ import plotly.graph_objects as go
 import polars as pl
 import streamlit as st
 from plotly.subplots import make_subplots
+from pmhelpers.dataprocessing import load_data
+from pmhelpers.plots import plot_timeseries_stacked_plotly
 from utils.ui_components_mpd import (
     render_component_cards,
     render_error_count_display,
@@ -13,10 +15,7 @@ from utils.ui_components_mpd import (
     render_machine_table,
 )
 
-from pmhelpers.dataprocessing import load_data
-from pmhelpers.plots import plot_timeseries_stacked_plotly
-
-DASH_DATA_PATH = "./data/dash_demo.csv"
+DASH_DATA_PATH = "./app/data/dash_demo.csv"
 COMP_SENSOR_LOOKUP = {
     "comp1": ["mean_daily_voltage", "comp1_failure_proba"],
     "comp2": ["mean_daily_rotation", "comp2_failure_proba"],

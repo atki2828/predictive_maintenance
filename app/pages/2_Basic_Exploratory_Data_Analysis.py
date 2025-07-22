@@ -11,7 +11,6 @@ from app_text import (
     weibull_survival_text,
 )
 from lifelines import WeibullFitter
-
 from pmhelpers.dataprocessing import load_data
 from pmhelpers.models import create_survival_model_dict
 from pmhelpers.plots import (
@@ -22,16 +21,16 @@ from pmhelpers.plots import (
 )
 
 plt.style.use("ggplot")
-TELEMETRY_FILE_PATH = "./data/PdM_telemetry.csv"
-FAILURE_FILE_PATH = "./data/PdM_failures.csv"
-MACHINE_FILE_PATH = "./data/PdM_machines.csv"
-MAINTENANCE_FILE_PATH = "./data/PdM_maintenance.csv"
-ERROR_FILE_PATH = "./data/PdM_errors.csv"
+TELEMETRY_FILE_PATH = "./app/data/PdM_telemetry.csv"
+FAILURE_FILE_PATH = "./app/data/PdM_failures.csv"
+MACHINE_FILE_PATH = "./app/data/PdM_machines.csv"
+MAINTENANCE_FILE_PATH = "./app/data/PdM_maintenance.csv"
+ERROR_FILE_PATH = "./app/data/PdM_errors.csv"
 
-COMP_FAIL_PLOT_PATH = "./data/comp_fail_plot.csv"
-MACHINE_FAIL_PLOT_PATH = "./data/machine_fail_plot.csv"
-TIME_BETWEEN_FAIL_FLAG_PATH = "./data/time_between_fail_flag.csv"
-TIME_TO_FAIL_PATH = "./data/time_to_fail.csv"
+COMP_FAIL_PLOT_PATH = "./app/data/comp_fail_plot.csv"
+MACHINE_FAIL_PLOT_PATH = "./app/data/machine_fail_plot.csv"
+TIME_BETWEEN_FAIL_FLAG_PATH = "./app/data/time_between_fail_flag.csv"
+TIME_TO_FAIL_PATH = "./app/data/time_to_fail.csv"
 
 
 def main():

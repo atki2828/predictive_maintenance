@@ -11,13 +11,12 @@ from app_text import (
     telemetry_component_two_text,
     telemetry_eda_intro,
 )
-
 from pmhelpers.dataprocessing import load_data
 from pmhelpers.plots import plot_timeseries_stacked
 
 plt.style.use("ggplot")
 
-DAILY_PLOT_DATA_PATH = "./data/daily_plot_df.csv"
+DAILY_PLOT_DATA_PATH = "./app/data/daily_plot_df.csv"
 
 
 @st.cache_data
