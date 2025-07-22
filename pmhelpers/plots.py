@@ -296,13 +296,15 @@ def plot_time_between_maintenance_dist(df: pl.DataFrame) -> plt.Figure:
 def plot_timeseries_stacked_plotly(
     df: pd.DataFrame, sensors: list, time_col="date", machine_id=None
 ):
+    # Convert Polars to Pandas if needed
     if isinstance(df, pl.DataFrame):
         df = df.to_pandas()
 
+    # Filter by machine ID if provided
     if machine_id is not None and "machineID" in df.columns:
         df = df[df["machineID"] == machine_id]
 
-    # Event style definitions
+    # Define event styles
     event_styles = {
         "error": {
             "columns": ["error1", "error2", "error3", "error4", "error5"],
@@ -345,26 +347,17 @@ def plot_timeseries_stacked_plotly(
                 mode="lines",
                 name=sensor.replace("_", " ").title(),
                 line=dict(color="#1f77b4", width=2),
+                showlegend=False,  # legend for events only
             ),
             row=i,
             col=1,
         )
 
-    # Add vertical event lines
+    # Build legend items (one copy per event type/color)
     legend_items = []
-    for event_type in ["failure", "maintenance", "error"]:  # order matters
+    for event_type in ["failure", "maintenance", "error"]:
         style = event_styles[event_type]
         for col, color in zip(style["columns"], style["colors"]):
-            event_times = df.loc[df[col] == 1, time_col]
-            for t in event_times:
-                fig.add_vline(
-                    x=t.strftime("%Y-%m-%d"),
-                    line_width=1.5,
-                    line_dash=style["dash"],
-                    line_color=color,
-                    annotation_text=None,
-                )
-            # Add legend item (fake trace for legend)
             legend_items.append(
                 go.Scatter(
                     x=[None],
@@ -375,13 +368,32 @@ def plot_timeseries_stacked_plotly(
                 )
             )
 
-    # Add legend items as invisible traces
+    # Add all legend traces
     for item in legend_items:
         fig.add_trace(item, row=1, col=1)
 
-    # Layout settings for Streamlit look
+    # Add vertical event lines per subplot
+    for i, sensor in enumerate(sensors, start=1):
+        yref = f"y{i}" if i > 1 else "y"
+        for event_type in ["failure", "maintenance", "error"]:
+            style = event_styles[event_type]
+            for col, color in zip(style["columns"], style["colors"]):
+                event_times = df.loc[df[col] == 1, time_col]
+                for t in event_times:
+                    fig.add_shape(
+                        type="line",
+                        x0=t,
+                        x1=t,
+                        y0=df[sensor].min(),
+                        y1=df[sensor].max(),
+                        xref="x",
+                        yref=yref,
+                        line=dict(color=color, dash=style["dash"], width=1.5),
+                    )
+
+    # Layout for Streamlit look
     fig.update_layout(
-        height=300 * n,
+        height=260 * n,
         title="Telemetry Time Series",
         template="plotly_white",
         legend=dict(
@@ -390,7 +402,7 @@ def plot_timeseries_stacked_plotly(
             y=1,
             xanchor="left",
             x=1.02,
-            title="Telemetry Event Legend",
+            title="Event Legend",
         ),
         margin=dict(l=40, r=200, t=60, b=40),
     )
