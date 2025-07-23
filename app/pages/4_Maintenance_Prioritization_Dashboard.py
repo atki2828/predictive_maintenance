@@ -64,7 +64,7 @@ def main():
                 plot_fig = plot_timeseries_stacked_plotly(
                     machine_analysis_df, sensors=sensors
                 )
-                st.plotly_chart(plot_fig)
+                st.plotly_chart(plot_fig, use_containter_width=False)
     else:
         st.warning("⚠️ Please select a **Date** and **Top N Machines** to begin.")
 
