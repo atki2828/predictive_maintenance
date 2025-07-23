@@ -259,4 +259,6 @@ Below are the components and their associated telemetry signals:
 - **Component 4** → Spike in Vibration
 
 
-**The z-score calculation is performed in the cell below**"""
+### Note 📝  
+**For training of the Cox PH model I shifted the telemetry signal 2 days ahead.**   
+**Thus, the model output is interpreted as probability of failure in 2 days**."""

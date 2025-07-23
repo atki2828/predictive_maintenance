@@ -18,4 +18,15 @@ __pycache__/
 # Big Data CSVs
 *model_data.csv
 *validation_analysis.csv
-*.csv
+*comp_fail_plot.csv
+*daily_plot_df.csv
+*machine_fail_plot.csv
+*model_data.csv
+*PdM_errors.csv
+*PdM_failures.csv
+*PdM_machines.csv
+*PdM_maintenance.csv
+*PdM_telemetry.csv
+*time_between_fail_flag.csv
+*time_to_fail.csv
+*validation_analysis.csv

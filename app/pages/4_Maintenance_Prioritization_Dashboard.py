@@ -1,19 +1,16 @@
 from datetime import date, datetime, timedelta
 
-import numpy as np
-import pandas as pd
-import plotly.graph_objects as go
 import polars as pl
 import streamlit as st
-from plotly.subplots import make_subplots
-from pmhelpers.dataprocessing import load_data
-from pmhelpers.plots import plot_timeseries_stacked_plotly
 from utils.ui_components_mpd import (
     render_component_cards,
     render_error_count_display,
     render_input_section,
     render_machine_table,
 )
+
+from pmhelpers.dataprocessing import load_data
+from pmhelpers.plots import plot_timeseries_stacked_plotly
 
 DASH_DATA_PATH = "./app/data/dash_demo.csv"
 COMP_SENSOR_LOOKUP = {
