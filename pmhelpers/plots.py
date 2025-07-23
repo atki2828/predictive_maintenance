@@ -669,7 +669,7 @@ def plot_timeseries_stacked_plotly(
     # Layout for Streamlit look
     fig.update_layout(
         height=260 * n,
-        title="Telemetry Time Series",
+        title="Telemetry Signal and Component Failure Probability",
         template="plotly_white",
         legend=dict(
             orientation="v",
