@@ -2,7 +2,7 @@ import os
 
 import polars as pl
 
-from app.pmhelpers.dataprocessing import (
+from pmhelpers.dataprocessing import (
     create_comp_dash_demo_df,
     create_fail_prob_dash_demo_df,
     create_telemetry_dash_demo_df,
