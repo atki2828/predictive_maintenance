@@ -194,7 +194,7 @@ compare_time_between_fail_text = """ ### Comparing time between regularly schedu
 This comparison shows that regular maintenance seems to require replacing the component every 15 days. For the instance marked 0 (in red) Ican see that most of the time components are replaced 15 days and that component failures occur when this regular maintenace was missed. """
 
 telemetry_eda_intro = """
-## Telemetry Data
+## Telemetry Data 📈
 
 After looking at much of the telemetry data, I found that in this contrived likely A.I. generated dataset there were particular patterns of failure that can be seen across each component. The following plots will detail each one and they will ultimately inform the modeling strategy. 
 
