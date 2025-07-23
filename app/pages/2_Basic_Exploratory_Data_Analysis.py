@@ -1,8 +1,7 @@
-import matplotlib.pyplot as plt
-import polars as pl
+import os
+
 import streamlit as st
 from app_text import (
-    all_machine_failures_text,
     compare_time_between_fail_text,
     component_failure_text,
     eda_intro,
@@ -10,87 +9,66 @@ from app_text import (
     time_between_failure_text,
     weibull_survival_text,
 )
-from lifelines import WeibullFitter
 
-from pmhelpers.dataprocessing import load_data
-from pmhelpers.models import create_survival_model_dict
-from pmhelpers.plots import (
-    plot_box_and_strip,
-    plot_failure_counts,
-    plot_time_between_failures_dist,
-    survival_hazard_group_plotter,
-)
-
-plt.style.use("ggplot")
-TELEMETRY_FILE_PATH = "./app/data/PdM_telemetry.csv"
-FAILURE_FILE_PATH = "./app/data/PdM_failures.csv"
-MACHINE_FILE_PATH = "./app/data/PdM_machines.csv"
-MAINTENANCE_FILE_PATH = "./app/data/PdM_maintenance.csv"
-ERROR_FILE_PATH = "./app/data/PdM_errors.csv"
-
-COMP_FAIL_PLOT_PATH = "./app/data/comp_fail_plot.csv"
-MACHINE_FAIL_PLOT_PATH = "./app/data/machine_fail_plot.csv"
-TIME_BETWEEN_FAIL_FLAG_PATH = "./app/data/time_between_fail_flag.csv"
-TIME_TO_FAIL_PATH = "./app/data/time_to_fail.csv"
+BASE_DIR = "app/"
 
 
 def main():
     # Read and Cache Data
     st.set_page_config(layout="centered", page_icon="🔎")
-    comp_fail_plot_df = load_data(COMP_FAIL_PLOT_PATH)
-    time_to_fail_df = load_data(TIME_TO_FAIL_PATH)
-    time_between_comp_fail_flag_df = load_data(TIME_BETWEEN_FAIL_FLAG_PATH)
-    component_weibull_dict = create_survival_model_dict(
-        fail_flag_df=time_between_comp_fail_flag_df,
-        model=WeibullFitter,
-        group_level_col="model",
-        duration_col="time_between_maintenance",
-        observe_col="fail_flag",
-    )
 
     # Intro
     st.markdown(eda_intro)
 
     # Component Failure Plot
-    failure_count_fig = plot_failure_counts(comp_fail_plot_df)
+    comp_fail_path = os.path.join(BASE_DIR, "static_plots", "failure_count.png")
     st.markdown(component_failure_text)
-    st.pyplot(failure_count_fig)
+    st.image(comp_fail_path, caption="Failure Distribution", use_container_width=True)
     st.divider()
 
-    # Time To Failure dist
+    # Time To Failure Distribution
+    time_between_comp_fail_dist_path = os.path.join(
+        BASE_DIR, "static_plots", "time_between_comp_fail_dist.png"
+    )
     st.markdown(time_between_failure_text)
-    time_between_fail_dist_fig = plot_time_between_failures_dist(time_to_fail_df)
-    st.pyplot(time_between_fail_dist_fig)
+    st.image(
+        time_between_comp_fail_dist_path,
+        caption="Time Between Failures Distribution",
+        use_container_width=True,
+    )
     st.divider()
 
-    # Time Between Component Failure Text
+    # Time Between Component Failure (Box + Strip)
+    time_between_comp_fail_fig_path = os.path.join(
+        BASE_DIR, "static_plots", "time_to_fail_by_comp.png"
+    )
     st.markdown(time_between_comp_fail_text)
-    time_between_comp_fail_fig = plot_box_and_strip(
-        df=time_to_fail_df.sort("failure").to_pandas(),
-        x="failure",
-        y="time_between_failures",
-        title="Time Between Failures By Component",
+    st.image(
+        time_between_comp_fail_fig_path,
+        caption="Time Between Failures by Component",
+        use_container_width=True,
     )
-    st.pyplot(time_between_comp_fail_fig)
     st.divider()
 
-    # Compare Time Between Fail Text
+    # Compare Time Between Fail (Box + Strip)
+    compare_fig_path = os.path.join(BASE_DIR, "static_plots", "compare_fig.png")
     st.markdown(compare_time_between_fail_text)
-    compare_fig = plot_box_and_strip(
-        time_between_comp_fail_flag_df.to_pandas(),
-        x="fail_flag",
-        y="time_between_maintenance",
-        title="Time Between Maintenance and Failures",
+    st.image(
+        compare_fig_path,
+        caption="Time Between Maintenance and Failures",
+        use_container_width=True,
     )
-    st.pyplot(compare_fig)
     st.divider()
 
-    # Survival and Weibull Analysis DF
+    # Survival and Weibull Analysis
+    survival_fig_path = os.path.join(BASE_DIR, "static_plots", "survival.png")
     st.markdown(weibull_survival_text)
-    survival_fig = survival_hazard_group_plotter(
-        component_weibull_dict, model_name="Weibull Model"
+    st.image(
+        survival_fig_path,
+        caption="Weibull Model Survival and Hazard Functions",
+        use_container_width=True,
     )
-    st.pyplot(survival_fig)
+    st.divider()
 
 
 if __name__ == "__main__":

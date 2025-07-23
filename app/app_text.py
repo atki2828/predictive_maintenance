@@ -185,9 +185,9 @@ time_between_failure_text = """ ### Pure Time Between Failures
 Since our model will take into account the time to event, it is worthwhile to take a look at the distribution of time between failures across components."""
 
 time_between_comp_fail_text = """### Time Between Component Failures
-Here Ibreakout the distribution of time between component failures across all the 4 components on each machine.
+Here I breakout the distribution of time between component failures across all the 4 components on each machine.
 
-Ican also see that the failure records occur in multiples of 15 days. (product of a contrived likely simulated dataset). """
+ I can also see that the failure records occur in multiples of 15 days. (product of a contrived likely simulated dataset). """
 
 compare_time_between_fail_text = """ ### Comparing time between regularly scheduled maintenace and component failure
 
