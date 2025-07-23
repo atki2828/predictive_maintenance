@@ -1,7 +1,7 @@
 [project]
-name = "pmhelpers"
+name = "predictive-maintenance-app"  # ✅ Give the whole project a proper name
 version = "0.1.0"
-description = "Helpers for predictive maintenance analysis"
+description = "Streamlit app for predictive maintenance analysis"
 authors = [{ name = "Michael Atkinson", email = "atki2828@gmail.com" }]
 readme = "README.md"
 requires-python = ">=3.10"
@@ -23,9 +23,9 @@ dependencies = [
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools]
-# Now that src is gone, just point to the root directory
-packages = ["pmhelpers"]
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["pmhelpers"]  # ✅ Explicitly include the helpers folder
 
 [tool.isort]
 profile = "black"
