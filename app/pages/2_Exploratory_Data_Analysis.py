@@ -15,7 +15,7 @@ BASE_DIR = "app/"
 
 def main():
     # Read and Cache Data
-    st.set_page_config(layout="centered", page_icon="🔎")
+    st.set_page_config(layout="wide", page_icon="🔎")
 
     # Intro
     st.markdown(eda_intro)
