@@ -3,7 +3,7 @@
 ![Streamlit App Demo](good_demo.gif)
 
 ## Overview
-This project demonstrates how **Survival Analysis** or **Survival Regression** can be applied to predictive maintenance using real data. Instead of relying on black box deep learning approaches, I used the **Cox Proportional Hazards Model with time-varying covariates** (via the [lifelines](https://lifelines.readthedocs.io/) package) to estimate machine component failure probability 2 days ahead.
+This project demonstrates how **Survival Regression** can be applied to predictive maintenance on a fleet of machines using real telemetry data. Instead of relying on black box deep learning approaches, I used the **Cox Proportional Hazards Model with time-varying covariates** (via the [lifelines](https://lifelines.readthedocs.io/) package) to estimate machine component failure probability 2 days ahead.
 
 The dataset comes from the **Microsoft Azure Predictive Maintenance** sample, which includes telemetry, error logs, and maintenance records for a fleet of machines. The model predicts **failure probabilities** for individual components, allowing maintenance teams to **prioritize inspections and repairs** in a data driven way.
 
